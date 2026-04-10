@@ -1,0 +1,54 @@
+body {
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.material-symbols-outlined {
+    font-variation-settings:
+        "FILL" 0,
+        "wght" 400,
+        "GRAD" 0,
+        "opsz" 24;
+    font-size: 1.125rem;
+    line-height: 1;
+}
+
+.internhub-shell {
+    background: radial-gradient(
+        circle at 0 0,
+        rgb(var(--color-surface-subtle)) 0%,
+        rgb(var(--color-canvas)) 45%,
+        rgb(var(--color-surface-muted)) 100%
+    );
+}
+
+.dark .internhub-shell {
+    background: radial-gradient(
+        circle at 0 0,
+        rgb(var(--color-surface-muted)) 0%,
+        rgb(var(--color-canvas)) 45%,
+        rgb(var(--color-surface)) 100%
+    );
+}
+
+.internhub-glass {
+    background: rgb(var(--color-surface) / 0.82);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.dark .internhub-glass {
+    background: rgb(var(--color-surface-muted) / 0.75);
+}
+
+.internhub-shadow {
+    box-shadow: 0 12px 36px rgb(var(--color-content) / 0.12);
+}
+
+.internhub-chip {
+    border-radius: 9999px;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    text-transform: uppercase;
+}

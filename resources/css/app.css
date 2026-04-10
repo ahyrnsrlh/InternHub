@@ -1,3 +1,79 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    :root {
+        --color-canvas: 241 245 249;
+        --color-surface: 255 255 255;
+        --color-surface-muted: 241 245 249;
+        --color-surface-subtle: 248 250 252;
+        --color-surface-inverse: 15 23 42;
+
+        --color-content: 15 23 42;
+        --color-content-muted: 71 85 105;
+        --color-content-soft: 100 116 139;
+        --color-content-inverse: 248 250 252;
+
+        --color-line: 203 213 225;
+        --color-line-soft: 226 232 240;
+        --color-line-strong: 148 163 184;
+        --color-line-inverse: 71 85 105;
+
+        --color-primary: 15 23 42;
+        --color-primary-hover: 30 41 59;
+        --color-primary-soft: 226 232 240;
+        --color-primary-foreground: 248 250 252;
+
+        --color-success: 5 150 105;
+        --color-success-soft: 209 250 229;
+        --color-success-foreground: 236 253 245;
+
+        --color-warning: 217 119 6;
+        --color-warning-soft: 254 243 199;
+        --color-warning-foreground: 255 251 235;
+
+        --color-danger: 225 29 72;
+        --color-danger-soft: 255 228 230;
+        --color-danger-foreground: 255 241 242;
+    }
+
+    .dark {
+        --color-canvas: 2 6 23;
+        --color-surface: 15 23 42;
+        --color-surface-muted: 30 41 59;
+        --color-surface-subtle: 51 65 85;
+        --color-surface-inverse: 248 250 252;
+
+        --color-content: 248 250 252;
+        --color-content-muted: 203 213 225;
+        --color-content-soft: 148 163 184;
+        --color-content-inverse: 15 23 42;
+
+        --color-line: 71 85 105;
+        --color-line-soft: 51 65 85;
+        --color-line-strong: 100 116 139;
+        --color-line-inverse: 226 232 240;
+
+        --color-primary: 148 163 184;
+        --color-primary-hover: 203 213 225;
+        --color-primary-soft: 30 41 59;
+        --color-primary-foreground: 15 23 42;
+
+        --color-success: 52 211 153;
+        --color-success-soft: 6 78 59;
+        --color-success-foreground: 236 253 245;
+
+        --color-warning: 251 191 36;
+        --color-warning-soft: 120 53 15;
+        --color-warning-foreground: 255 251 235;
+
+        --color-danger: 251 113 133;
+        --color-danger-soft: 136 19 55;
+        --color-danger-foreground: 255 241 242;
+    }
+
+    body {
+        @apply bg-canvas text-content antialiased;
+    }
+}
