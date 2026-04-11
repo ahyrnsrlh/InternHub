@@ -19,6 +19,10 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    public const ROLE_ADMIN = 'admin';
+    public const ROLE_INTERN = 'intern';
+    public const ROLE_USER = 'user';
+
     /**
      * Get the attributes that should be cast.
      *
@@ -55,5 +59,10 @@ class User extends Authenticatable
     public function mentees(): HasMany
     {
         return $this->hasMany(User::class, 'mentor_id');
+    }
+
+    public function hasRole(string ...$roles): bool
+    {
+        return in_array($this->role, $roles, true);
     }
 }

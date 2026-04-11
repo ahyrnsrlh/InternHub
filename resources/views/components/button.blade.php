@@ -5,10 +5,11 @@
 
 @php
     $variants = [
-        'primary' => 'bg-primary text-content-inverse hover:bg-primary-hover',
-        'secondary' => 'bg-primary-soft text-content hover:bg-line-strong',
-        'success' => 'bg-success text-success-foreground hover:bg-success',
-        'ghost' => 'bg-transparent text-content-muted hover:bg-primary-soft',
+        'primary' => 'bg-indigo-600 text-white hover:bg-indigo-700 focus-visible:ring-indigo-200',
+        'secondary' => 'bg-gray-100 text-gray-700 hover:bg-gray-200 focus-visible:ring-gray-200',
+        'success' => 'bg-green-500 text-white hover:bg-green-600 focus-visible:ring-green-200',
+        'danger' => 'bg-red-500 text-white hover:bg-red-600 focus-visible:ring-red-200',
+        'ghost' => 'bg-transparent text-gray-600 hover:bg-gray-100 focus-visible:ring-gray-200',
     ];
 
     $classes = $variants[$variant] ?? $variants['primary'];
@@ -16,7 +17,7 @@
 
 <button
     type="{{ $type }}"
-    {{ $attributes->merge(['class' => "inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold transition-colors {$classes}"]) }}
+    {{ $attributes->merge(['class' => "inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold shadow-sm transition focus-visible:outline-none focus-visible:ring-4 {$classes}"]) }}
 >
     {{ $slot }}
 </button>

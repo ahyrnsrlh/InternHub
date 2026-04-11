@@ -4,12 +4,12 @@
     'padding' => 'p-6',
 ])
 
-<section {{ $attributes->merge(['class' => "bg-surface rounded-2xl shadow-sm border border-line {$padding}"]) }}>
+<section {{ $attributes->merge(['class' => "rounded-xl border border-gray-200 bg-white shadow-sm {$padding}"]) }}>
     @if ($title)
         <header class="mb-4">
-            <h3 class="text-lg font-bold tracking-tight text-content">{{ $title }}</h3>
+            <h3 class="text-lg font-semibold tracking-tight text-gray-900">{{ $title }}</h3>
             @if ($subtitle)
-                <p class="text-sm text-content-muted mt-1">{{ $subtitle }}</p>
+                <p class="mt-1 text-sm text-gray-500">{{ $subtitle }}</p>
             @endif
         </header>
     @endif
