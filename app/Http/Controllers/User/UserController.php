@@ -7,6 +7,7 @@ use App\Models\DailyLog;
 use App\Models\User;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\UserDashboardRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -104,5 +105,85 @@ class UserController extends Controller
         $user->update(['status' => 'inactive']);
 
         return redirect()->route('user.dashboard.index')->with('status', 'Status akun berhasil diubah menjadi tidak aktif.');
+    }
+
+    public function getUserAttendanceTrend(): JsonResponse
+    {
+        $userId = (int) Auth::id();
+        $days = collect(range(6, 0))
+            ->map(fn (int $offset) => now()->subDays($offset)->toDateString())
+            ->values();
+
+        $attendanceByDate = Attendance::query()
+            ->selectRaw('DATE(check_in_time) as date_key, COUNT(*) as total')
+            ->where('user_id', $userId)
+            ->whereDate('check_in_time', '>=', now()->subDays(6)->toDateString())
+            ->groupBy('date_key')
+            ->pluck('total', 'date_key');
+
+        $present = [];
+        $absent = [];
+        $labels = [];
+
+        foreach ($days as $day) {
+            $count = (int) ($attendanceByDate[$day] ?? 0);
+            $present[] = $count > 0 ? 1 : 0;
+            $absent[] = $count > 0 ? 0 : 1;
+            $labels[] = \Illuminate\Support\Carbon::parse($day)->format('d M');
+        }
+
+        return response()->json([
+            'labels' => $labels,
+            'present' => $present,
+            'absent' => $absent,
+        ]);
+    }
+
+    public function getUserValidationStats(): JsonResponse
+    {
+        $userId = (int) Auth::id();
+
+        $valid = Attendance::query()
+            ->where('user_id', $userId)
+            ->where('status', 'valid')
+            ->count();
+
+        $invalid = Attendance::query()
+            ->where('user_id', $userId)
+            ->where('status', 'invalid')
+            ->count();
+
+        return response()->json([
+            'labels' => ['Valid', 'Invalid'],
+            'values' => [$valid, $invalid],
+        ]);
+    }
+
+    public function getUserActivityStats(): JsonResponse
+    {
+        $userId = (int) Auth::id();
+        $days = collect(range(6, 0))
+            ->map(fn (int $offset) => now()->subDays($offset)->toDateString())
+            ->values();
+
+        $activityByDate = DailyLog::query()
+            ->selectRaw('DATE(log_date) as date_key, COUNT(*) as total')
+            ->where('user_id', $userId)
+            ->whereDate('log_date', '>=', now()->subDays(6)->toDateString())
+            ->groupBy('date_key')
+            ->pluck('total', 'date_key');
+
+        $labels = [];
+        $values = [];
+
+        foreach ($days as $day) {
+            $labels[] = \Illuminate\Support\Carbon::parse($day)->format('d M');
+            $values[] = (int) ($activityByDate[$day] ?? 0);
+        }
+
+        return response()->json([
+            'labels' => $labels,
+            'values' => $values,
+        ]);
     }
 }

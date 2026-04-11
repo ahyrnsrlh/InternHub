@@ -9,8 +9,10 @@ use App\Models\DailyLog;
 use App\Models\Location;
 use App\Models\User;
 use Illuminate\Support\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -260,5 +262,106 @@ class AdminPageController extends Controller
             : 0;
 
         return view('pages.admin.reports', compact('dailyReports', 'summary', 'attendanceRate', 'startDate', 'endDate'));
+    }
+
+    public function getAdminAttendanceStats(): JsonResponse
+    {
+        $days = collect(range(6, 0))
+            ->map(fn (int $offset) => now()->subDays($offset)->toDateString())
+            ->values();
+
+        $attendanceByDate = Attendance::query()
+            ->selectRaw('DATE(check_in_time) as date_key, COUNT(*) as total')
+            ->whereDate('check_in_time', '>=', now()->subDays(6)->toDateString())
+            ->groupBy('date_key')
+            ->pluck('total', 'date_key');
+
+        $labels = [];
+        $values = [];
+
+        foreach ($days as $day) {
+            $labels[] = Carbon::parse($day)->format('d M');
+            $values[] = (int) ($attendanceByDate[$day] ?? 0);
+        }
+
+        return response()->json([
+            'labels' => $labels,
+            'values' => $values,
+        ]);
+    }
+
+    public function getAdminValidationStats(): JsonResponse
+    {
+        $valid = Attendance::query()->where('status', 'valid')->count();
+        $invalid = Attendance::query()->where('status', 'invalid')->count();
+
+        return response()->json([
+            'labels' => ['Valid', 'Invalid'],
+            'values' => [$valid, $invalid],
+        ]);
+    }
+
+    public function getAdminTrendStats(): JsonResponse
+    {
+        $months = collect(range(5, 0))
+            ->map(fn (int $offset) => Carbon::now()->startOfMonth()->subMonths($offset))
+            ->values();
+
+        $monthly = Attendance::query()
+            ->selectRaw('DATE_FORMAT(check_in_time, "%Y-%m") as month_key, COUNT(*) as total')
+            ->whereDate('check_in_time', '>=', Carbon::now()->startOfMonth()->subMonths(5)->toDateString())
+            ->groupBy('month_key')
+            ->pluck('total', 'month_key');
+
+        $labels = [];
+        $values = [];
+
+        foreach ($months as $month) {
+            $key = $month->format('Y-m');
+            $labels[] = $month->format('M Y');
+            $values[] = (int) ($monthly[$key] ?? 0);
+        }
+
+        return response()->json([
+            'labels' => $labels,
+            'values' => $values,
+        ]);
+    }
+
+    public function getTopInterns(): JsonResponse
+    {
+        $interns = User::query()
+            ->whereIn('role', [User::ROLE_INTERN, User::ROLE_USER])
+            ->leftJoin('attendances', 'attendances.user_id', '=', 'users.id')
+            ->leftJoin('daily_logs', 'daily_logs.user_id', '=', 'users.id')
+            ->groupBy('users.id', 'users.name')
+            ->select([
+                'users.id',
+                'users.name',
+                DB::raw('COUNT(DISTINCT attendances.id) as attendance_count'),
+                DB::raw('COUNT(DISTINCT daily_logs.id) as activity_count'),
+            ])
+            ->get()
+            ->map(function ($row) {
+                $attendanceCount = (int) $row->attendance_count;
+                $activityCount = (int) $row->activity_count;
+
+                return [
+                    'name' => $row->name,
+                    'attendance_count' => $attendanceCount,
+                    'activity_count' => $activityCount,
+                    'score' => $attendanceCount + $activityCount,
+                ];
+            })
+            ->sortByDesc('score')
+            ->take(7)
+            ->values();
+
+        return response()->json([
+            'labels' => $interns->pluck('name')->all(),
+            'attendance_values' => $interns->pluck('attendance_count')->all(),
+            'activity_values' => $interns->pluck('activity_count')->all(),
+            'score_values' => $interns->pluck('score')->all(),
+        ]);
     }
 }

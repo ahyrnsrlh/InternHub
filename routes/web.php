@@ -43,6 +43,10 @@ Route::prefix('internhub')->name('internhub.')->middleware(['auth', 'verified'])
 
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
         Route::get('/dashboard', [AdminPageController::class, 'dashboard'])->name('dashboard');
+        Route::get('/dashboard/charts/attendance', [AdminPageController::class, 'getAdminAttendanceStats'])->name('dashboard.charts.attendance');
+        Route::get('/dashboard/charts/validation', [AdminPageController::class, 'getAdminValidationStats'])->name('dashboard.charts.validation');
+        Route::get('/dashboard/charts/trend', [AdminPageController::class, 'getAdminTrendStats'])->name('dashboard.charts.trend');
+        Route::get('/dashboard/charts/top-interns', [AdminPageController::class, 'getTopInterns'])->name('dashboard.charts.top-interns');
         Route::get('/interns', [AdminPageController::class, 'interns'])->name('interns');
         Route::post('/interns', [AdminPageController::class, 'storeIntern'])->name('interns.store');
         Route::get('/interns/{intern}', [AdminPageController::class, 'internDetail'])->name('intern-detail');
@@ -100,6 +104,9 @@ Route::prefix('user')->name('user.')->middleware(['auth', 'verified', 'role:inte
     Route::resource('dashboard', UserController::class)
         ->except(['show'])
         ->middleware('face.registered');
+    Route::get('/dashboard/charts/attendance-trend', [UserController::class, 'getUserAttendanceTrend'])->middleware('face.registered')->name('dashboard.charts.attendance-trend');
+    Route::get('/dashboard/charts/validation', [UserController::class, 'getUserValidationStats'])->middleware('face.registered')->name('dashboard.charts.validation');
+    Route::get('/dashboard/charts/activity', [UserController::class, 'getUserActivityStats'])->middleware('face.registered')->name('dashboard.charts.activity');
     Route::resource('attendance', AttendanceController::class)
         ->except(['show'])
         ->middleware('face.registered');

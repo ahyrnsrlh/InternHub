@@ -4,64 +4,57 @@
 @section('header', 'Beranda')
 
 @section('content')
-<div class="space-y-6" x-data="{ loading: false }">
-    @php
-        $maxTrend = max(1, collect($attendanceTrend)->max('count'));
-    @endphp
+<div
+    class="space-y-6"
+    data-admin-attendance-url="{{ route('internhub.admin.dashboard.charts.attendance') }}"
+    data-admin-validation-url="{{ route('internhub.admin.dashboard.charts.validation') }}"
+    data-admin-trend-url="{{ route('internhub.admin.dashboard.charts.trend') }}"
+    data-admin-top-interns-url="{{ route('internhub.admin.dashboard.charts.top-interns') }}"
+>
 
     <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <x-card>
-            <p class="text-sm text-gray-500">Total Peserta Magang</p>
-            <p class="mt-2 text-3xl font-bold text-gray-900">{{ $summary['totalInterns'] }}</p>
-            <p class="mt-1 text-xs text-gray-500">Peserta aktif: {{ $summary['activeInterns'] }}</p>
+        <x-card class="!border-blue-500 !bg-blue-600">
+            <p class="text-sm font-medium text-white">Total Peserta Magang</p>
+            <p class="mt-2 text-3xl font-bold text-white">{{ $summary['totalInterns'] }}</p>
+            <p class="mt-1 text-xs text-blue-100">Peserta aktif: {{ $summary['activeInterns'] }}</p>
         </x-card>
-        <x-card>
-            <p class="text-sm text-gray-500">Kehadiran Hari Ini</p>
-            <p class="mt-2 text-3xl font-bold text-gray-900">{{ $summary['attendanceToday'] }}</p>
-            <p class="mt-1 text-xs text-green-500">{{ $summary['attendanceRate'] }}% valid</p>
+        <x-card class="!border-blue-500 !bg-blue-600">
+            <p class="text-sm font-medium text-white">Kehadiran Hari Ini</p>
+            <p class="mt-2 text-3xl font-bold text-white">{{ $summary['attendanceToday'] }}</p>
+            <p class="mt-1 text-xs text-blue-100">{{ $summary['attendanceRate'] }}% valid</p>
         </x-card>
-        <x-card>
-            <p class="text-sm text-gray-500">Ringkasan Validasi</p>
-            <p class="mt-2 text-3xl font-bold text-gray-900">{{ $summary['validAttendanceToday'] }} / {{ $summary['invalidAttendanceToday'] }}</p>
-            <p class="mt-1 text-xs text-gray-500">Valid / Tidak valid (hari ini)</p>
+        <x-card class="!border-blue-500 !bg-blue-600">
+            <p class="text-sm font-medium text-white">Ringkasan Validasi</p>
+            <p class="mt-2 text-3xl font-bold text-white">{{ $summary['validAttendanceToday'] }} / {{ $summary['invalidAttendanceToday'] }}</p>
+            <p class="mt-1 text-xs text-blue-100">Valid / Tidak valid (hari ini)</p>
         </x-card>
     </section>
 
     <section class="grid gap-4 lg:grid-cols-3">
-        <x-card class="lg:col-span-2" title="Tren Kehadiran" subtitle="Tren presensi harian pada bulan berjalan.">
-            <div class="h-64 rounded-xl border border-dashed border-gray-300 bg-gradient-to-b from-indigo-50 to-white p-4">
-                <div class="relative h-full rounded-lg bg-white/70 p-4">
-                    <div class="absolute bottom-10 left-4 right-4 h-px bg-gray-200"></div>
-                    <div class="absolute bottom-10 left-4 right-4 flex items-end justify-between gap-3">
-                        @foreach ($attendanceTrend as $value)
-                            @php
-                                $ratio = $maxTrend > 0 ? ($value['count'] / $maxTrend) : 0;
-                                $heightClass = match (true) {
-                                    $ratio >= 0.9 => 'h-40',
-                                    $ratio >= 0.8 => 'h-36',
-                                    $ratio >= 0.7 => 'h-32',
-                                    $ratio >= 0.6 => 'h-28',
-                                    $ratio >= 0.5 => 'h-24',
-                                    $ratio >= 0.4 => 'h-20',
-                                    $ratio >= 0.3 => 'h-16',
-                                    $ratio >= 0.2 => 'h-12',
-                                    default => 'h-8',
-                                };
-                            @endphp
-                            <div class="flex w-full flex-col items-center gap-1">
-                                <div class="w-full max-w-10 rounded-t bg-indigo-500 {{ $heightClass }}"></div>
-                                <span class="text-[10px] text-gray-500">{{ $value['date_label'] }}</span>
-                                <span class="text-[10px] font-semibold text-gray-700">{{ $value['count'] }}</span>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
+        <x-card class="lg:col-span-2" title="Total Attendance per Day" subtitle="Agregasi semua pengguna untuk 7 hari terakhir.">
+            <div class="h-80">
+                <canvas id="adminAttendanceBarChart"></canvas>
             </div>
         </x-card>
 
-        <x-card title="Aktivitas 7 Hari" subtitle="Ringkasan aktivitas logbook terbaru.">
-            <p class="text-3xl font-bold text-gray-900">{{ $summary['recentActivitiesCount'] }}</p>
-            <p class="mt-1 text-sm text-gray-500">catatan aktivitas tercatat 7 hari terakhir</p>
+        <x-card title="Valid vs Invalid" subtitle="Statistik validasi presensi global.">
+            <div class="h-80">
+                <canvas id="adminValidationDonutChart"></canvas>
+            </div>
+        </x-card>
+    </section>
+
+    <section class="grid gap-4 xl:grid-cols-3">
+        <x-card class="xl:col-span-2" title="Monthly Attendance Trend" subtitle="Pertumbuhan kehadiran bulanan seluruh peserta.">
+            <div class="h-80">
+                <canvas id="adminMonthlyTrendLineChart"></canvas>
+            </div>
+        </x-card>
+
+        <x-card title="Top Active Interns" subtitle="Skor berdasarkan attendance + activity logs.">
+            <div class="h-80">
+                <canvas id="adminTopInternsHorizontalChart"></canvas>
+            </div>
         </x-card>
     </section>
 
@@ -82,3 +75,145 @@
     </x-card>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+    window.addEventListener('DOMContentLoaded', async () => {
+        const container = document.querySelector('[data-admin-attendance-url]');
+        if (!container || typeof Chart === 'undefined') {
+            return;
+        }
+
+        const fetchJson = async (url) => {
+            const response = await fetch(url, { headers: { 'Accept': 'application/json' }, credentials: 'same-origin' });
+            if (!response.ok) {
+                throw new Error('Failed fetching admin chart data');
+            }
+
+            return response.json();
+        };
+
+        try {
+            const [attendanceStats, validationStats, trendStats, topInterns] = await Promise.all([
+                fetchJson(container.dataset.adminAttendanceUrl),
+                fetchJson(container.dataset.adminValidationUrl),
+                fetchJson(container.dataset.adminTrendUrl),
+                fetchJson(container.dataset.adminTopInternsUrl),
+            ]);
+
+            new Chart(document.getElementById('adminAttendanceBarChart'), {
+                type: 'bar',
+                data: {
+                    labels: attendanceStats.labels,
+                    datasets: [{
+                        label: 'Total Attendance',
+                        data: attendanceStats.values,
+                        backgroundColor: '#4f46e5',
+                        borderRadius: 8,
+                        maxBarThickness: 40,
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 850, easing: 'easeOutQuart' },
+                    plugins: { tooltip: { enabled: true }, legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { precision: 0 } },
+                    },
+                },
+            });
+
+            new Chart(document.getElementById('adminValidationDonutChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: validationStats.labels,
+                    datasets: [{
+                        data: validationStats.values,
+                        backgroundColor: ['#16a34a', '#dc2626'],
+                        borderWidth: 0,
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 800, easing: 'easeOutCubic' },
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: { enabled: true },
+                    },
+                },
+            });
+
+            new Chart(document.getElementById('adminMonthlyTrendLineChart'), {
+                type: 'line',
+                data: {
+                    labels: trendStats.labels,
+                    datasets: [{
+                        label: 'Monthly Attendance',
+                        data: trendStats.values,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.18)',
+                        fill: true,
+                        tension: 0.3,
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 900, easing: 'easeOutQuart' },
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: { enabled: true },
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { precision: 0 } },
+                    },
+                },
+            });
+
+            new Chart(document.getElementById('adminTopInternsHorizontalChart'), {
+                type: 'bar',
+                data: {
+                    labels: topInterns.labels,
+                    datasets: [
+                        {
+                            label: 'Attendance Count',
+                            data: topInterns.attendance_values,
+                            backgroundColor: '#4f46e5',
+                            borderRadius: 6,
+                        },
+                        {
+                            label: 'Activity Log Count',
+                            data: topInterns.activity_values,
+                            backgroundColor: '#10b981',
+                            borderRadius: 6,
+                        },
+                    ],
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 900, easing: 'easeOutQuart' },
+                    plugins: {
+                        tooltip: { enabled: true, mode: 'nearest' },
+                        legend: { position: 'bottom' },
+                    },
+                    scales: {
+                        x: { beginAtZero: true, ticks: { precision: 0 } },
+                    },
+                },
+            });
+        } catch (error) {
+            window.dispatchEvent(new CustomEvent('notify', {
+                detail: {
+                    message: 'Gagal memuat visualisasi dashboard admin.',
+                    type: 'error',
+                },
+            }));
+        }
+    });
+</script>
+@endpush

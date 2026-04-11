@@ -34,17 +34,28 @@
             <nav class="space-y-1 p-4">
                 @php
                     $menu = [
-                        ['label' => 'Beranda', 'route' => 'internhub.admin.dashboard'],
-                        ['label' => 'Peserta Magang', 'route' => 'internhub.admin.interns'],
-                        ['label' => 'Kehadiran', 'route' => 'internhub.admin.attendance'],
-                        ['label' => 'Lokasi Magang', 'route' => 'internhub.admin.locations'],
-                        ['label' => 'Laporan', 'route' => 'internhub.admin.reports'],
+                        ['label' => 'Beranda', 'route' => 'internhub.admin.dashboard', 'icon' => 'home'],
+                        ['label' => 'Peserta Magang', 'route' => 'internhub.admin.interns', 'icon' => 'users'],
+                        ['label' => 'Kehadiran', 'route' => 'internhub.admin.attendance', 'icon' => 'clock'],
+                        ['label' => 'Lokasi Magang', 'route' => 'internhub.admin.locations', 'icon' => 'pin'],
+                        ['label' => 'Laporan', 'route' => 'internhub.admin.reports', 'icon' => 'chart'],
                     ];
                 @endphp
 
                 @foreach ($menu as $item)
-                    <a href="{{ route($item['route']) }}" class="flex items-center rounded-xl px-3 py-2.5 text-sm font-medium transition {{ request()->routeIs($item['route']) ? 'bg-indigo-600 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
-                        {{ $item['label'] }}
+                    <a href="{{ route($item['route']) }}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition {{ request()->routeIs($item['route']) ? 'bg-indigo-600 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
+                        @if ($item['icon'] === 'home')
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 10.5L12 3l9 7.5V21a1 1 0 01-1 1h-5.5v-6h-5v6H4a1 1 0 01-1-1v-10.5z" /></svg>
+                        @elseif ($item['icon'] === 'users')
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M16 19a4 4 0 00-8 0"/><circle cx="12" cy="11" r="3" stroke-width="1.75"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M6 19a4 4 0 00-2.5-3.7M18 19a4 4 0 012.5-3.7"/></svg>
+                        @elseif ($item['icon'] === 'clock')
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9" stroke-width="1.75"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 7v5l3 2"/></svg>
+                        @elseif ($item['icon'] === 'pin')
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 21s7-5.5 7-11a7 7 0 10-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5" stroke-width="1.75"/></svg>
+                        @elseif ($item['icon'] === 'chart')
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M5 20V10m7 10V4m7 16v-7"/></svg>
+                        @endif
+                        <span>{{ $item['label'] }}</span>
                     </a>
                 @endforeach
             </nav>
