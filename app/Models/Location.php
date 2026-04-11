@@ -15,6 +15,8 @@ class Location extends Model
         'address',
         'latitude',
         'longitude',
+        'radius_meters',
+        'status',
     ];
 
     protected function casts(): array
@@ -22,6 +24,7 @@ class Location extends Model
         return [
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
+            'radius_meters' => 'integer',
         ];
     }
 

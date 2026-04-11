@@ -12,6 +12,7 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    @stack('styles')
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased" style="font-family: 'Manrope', sans-serif;">
     <div class="min-h-screen" x-data="{ sidebarOpen: false, profileOpen: false }">
@@ -116,5 +117,7 @@
             }
         });
     </script>
+
+    @stack('scripts')
 </body>
 </html>

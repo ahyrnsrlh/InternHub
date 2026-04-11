@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\LocationManagementRequest;
+use App\Models\Location;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class AdminPageController extends Controller
@@ -67,7 +70,32 @@ class AdminPageController extends Controller
 
     public function locations(): View
     {
-        return view('pages.admin.locations');
+        $locations = Location::query()
+            ->orderBy('name')
+            ->get(['id', 'name', 'address', 'latitude', 'longitude', 'radius_meters', 'status']);
+
+        return view('pages.admin.locations', compact('locations'));
+    }
+
+    public function storeLocation(LocationManagementRequest $request): RedirectResponse
+    {
+        Location::query()->create($request->validated());
+
+        return redirect()->route('internhub.admin.locations')->with('status', 'Location created successfully.');
+    }
+
+    public function updateLocation(LocationManagementRequest $request, Location $location): RedirectResponse
+    {
+        $location->update($request->validated());
+
+        return redirect()->route('internhub.admin.locations')->with('status', 'Location updated successfully.');
+    }
+
+    public function destroyLocation(Location $location): RedirectResponse
+    {
+        $location->delete();
+
+        return redirect()->route('internhub.admin.locations')->with('status', 'Location deleted successfully.');
     }
 
     public function reports(): View

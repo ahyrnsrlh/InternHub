@@ -19,7 +19,7 @@ class LocationRequest extends FormRequest
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'radius_meters' => ['nullable', 'integer', 'min:1', 'max:10000'],
-            'is_active' => ['nullable', 'boolean'],
+            'status' => ['nullable', 'in:active,inactive'],
         ];
     }
 }

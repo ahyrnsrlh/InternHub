@@ -22,7 +22,7 @@ Route::get('/dashboard', function () {
 
 Route::prefix('internhub')->name('internhub.')->middleware('guest')->group(function () {
     Route::view('/login', 'pages.user.auth.login')->name('login');
-    Route::view('/register', 'pages.user.auth.register')->name('register');
+    Route::view('/register', 'auth.register')->name('register');
     Route::get('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login');
 });
 
@@ -47,6 +47,9 @@ Route::prefix('internhub')->name('internhub.')->middleware(['auth', 'verified'])
         Route::get('/interns/{intern}', [AdminPageController::class, 'internDetail'])->name('intern-detail');
         Route::get('/attendance', [AdminPageController::class, 'attendance'])->name('attendance');
         Route::get('/locations', [AdminPageController::class, 'locations'])->name('locations');
+        Route::post('/locations', [AdminPageController::class, 'storeLocation'])->name('locations.store');
+        Route::put('/locations/{location}', [AdminPageController::class, 'updateLocation'])->name('locations.update');
+        Route::delete('/locations/{location}', [AdminPageController::class, 'destroyLocation'])->name('locations.destroy');
         Route::get('/reports', [AdminPageController::class, 'reports'])->name('reports');
     });
 
