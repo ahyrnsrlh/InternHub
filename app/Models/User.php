@@ -41,9 +41,19 @@ class User extends Authenticatable
         return $this->hasMany(AttendanceRecord::class);
     }
 
+    public function attendances(): HasMany
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
     public function dailyLogs(): HasMany
     {
         return $this->hasMany(DailyLog::class);
+    }
+
+    public function logbooks(): HasMany
+    {
+        return $this->hasMany(Logbook::class);
     }
 
     public function mentorReviews(): HasMany
