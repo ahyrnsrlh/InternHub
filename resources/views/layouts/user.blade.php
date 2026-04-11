@@ -40,9 +40,8 @@
             :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
         >
             <div class="flex h-16 items-center justify-between border-b border-gray-200 px-6">
-                <div>
-                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-600">InternHub</p>
-                    <h1 class="text-lg font-bold text-gray-900">Portal Peserta Magang</h1>
+                <div class="min-w-0">
+                    <img src="{{ asset('logo-internhub.png') }}" alt="Logo InternHub" class="h-12 w-auto object-contain">
                 </div>
                         <button class="rounded-lg p-2 text-gray-500 hover:bg-gray-100 lg:hidden" @click="sidebarOpen = false" aria-label="Tutup sidebar">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -104,11 +103,25 @@
                         <h2 class="text-lg font-semibold text-gray-900">@yield('header', 'Beranda Peserta')</h2>
                     </div>
 
+                    @php
+                        $authUser = auth()->user();
+                        $headerPhotoUrl = null;
+                        if ($authUser?->profile_photo && \Illuminate\Support\Facades\Storage::disk('public')->exists($authUser->profile_photo)) {
+                            $headerPhotoUrl = \Illuminate\Support\Facades\Storage::url($authUser->profile_photo);
+                        }
+                    @endphp
+
                     <div class="relative flex items-center gap-3">
                         <button class="rounded-full border border-gray-200 bg-white p-2 text-gray-500 hover:border-indigo-200 hover:text-indigo-600">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0a3 3 0 11-6 0" /></svg>
                         </button>
-                        <button class="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700" @click="profileOpen = !profileOpen" aria-label="Buka menu profil"></button>
+                        <button class="h-9 w-9 overflow-hidden rounded-full border border-gray-200 bg-white" @click="profileOpen = !profileOpen" aria-label="Buka menu profil">
+                            @if ($headerPhotoUrl)
+                                <img src="{{ $headerPhotoUrl }}" alt="Foto Profil" class="h-full w-full object-cover">
+                            @else
+                                <div class="h-full w-full bg-gradient-to-br from-indigo-500 to-indigo-700"></div>
+                            @endif
+                        </button>
 
                         <div x-show="profileOpen" x-transition class="absolute right-0 top-12 z-30 w-52 rounded-xl border border-gray-200 bg-white p-2 shadow-sm" @click.outside="profileOpen = false" style="display: none;">
                             <a href="{{ route('user.profile.index') }}" class="block rounded-lg px-3 py-2 text-sm text-gray-600 hover:bg-gray-100">Profil</a>

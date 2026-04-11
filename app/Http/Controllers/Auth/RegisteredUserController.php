@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
-use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
@@ -25,8 +24,6 @@ class RegisteredUserController extends Controller
 
     /**
      * Handle an incoming registration request.
-     *
-     * @throws ValidationException
      */
     public function store(Request $request): RedirectResponse
     {
@@ -34,31 +31,13 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'face_descriptor' => ['required', 'string'],
-            'liveness_verified' => ['required', 'accepted'],
         ]);
-
-        $descriptor = json_decode((string) $request->input('face_descriptor'), true);
-
-        if (! is_array($descriptor) || count($descriptor) !== 128) {
-            throw ValidationException::withMessages([
-                'face_descriptor' => 'Invalid face descriptor data. Please recapture your face.',
-            ]);
-        }
-
-        foreach ($descriptor as $value) {
-            if (! is_numeric($value)) {
-                throw ValidationException::withMessages([
-                    'face_descriptor' => 'Face descriptor contains invalid values.',
-                ]);
-            }
-        }
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'face_descriptor' => array_map(static fn ($item) => (float) $item, $descriptor),
+            'face_registered' => false,
         ]);
 
         event(new Registered($user));

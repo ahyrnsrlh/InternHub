@@ -39,7 +39,7 @@ Route::prefix('internhub')->name('internhub.')->middleware(['auth', 'verified'])
         }
 
         abort(403);
-    })->name('dashboard');
+    })->middleware('face.registered')->name('dashboard');
 
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
         Route::get('/dashboard', [AdminPageController::class, 'dashboard'])->name('dashboard');
@@ -54,11 +54,11 @@ Route::prefix('internhub')->name('internhub.')->middleware(['auth', 'verified'])
     });
 
     Route::name('intern.')->middleware('role:intern,user')->group(function () {
-        Route::view('/attendance', 'pages.user.attendance')->name('attendance');
+        Route::view('/attendance', 'pages.user.attendance')->middleware('face.registered')->name('attendance');
         Route::view('/locations', 'pages.user.locations')->name('locations');
         Route::view('/map', 'pages.user.map')->name('map');
-        Route::view('/logbook', 'pages.user.logbook')->name('logbook');
-        Route::view('/reports', 'pages.user.reports')->name('reports');
+        Route::view('/logbook', 'pages.user.logbook')->middleware('face.registered')->name('logbook');
+        Route::view('/reports', 'pages.user.reports')->middleware('face.registered')->name('reports');
         Route::view('/recap', 'pages.user.recap')->name('recap');
         Route::view('/profile', 'pages.user.profile')->name('profile');
     });
@@ -86,18 +86,27 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::prefix('user')->name('user.')->middleware(['auth', 'verified', 'role:intern,user'])->group(function () {
-    Route::post('/attendance/check-in', [AttendanceController::class, 'checkIn'])->name('attendance.check-in');
-    Route::patch('/attendance/check-out', [AttendanceController::class, 'checkOut'])->name('attendance.check-out');
-    Route::get('/reports/export/pdf', [ReportController::class, 'exportPdf'])->name('reports.export.pdf');
+    Route::post('/profile/face', [UserProfileController::class, 'storeFace'])->name('profile.face.store');
+    Route::post('/attendance/check-in', [AttendanceController::class, 'checkIn'])->middleware('face.registered')->name('attendance.check-in');
+    Route::patch('/attendance/check-out', [AttendanceController::class, 'checkOut'])->middleware('face.registered')->name('attendance.check-out');
+    Route::get('/reports/export/pdf', [ReportController::class, 'exportPdf'])->middleware('face.registered')->name('reports.export.pdf');
 
-    Route::resources([
-        'dashboard' => UserController::class,
-        'attendance' => AttendanceController::class,
-        'locations' => LocationController::class,
-        'logbook' => LogbookController::class,
-        'reports' => ReportController::class,
-        'profile' => UserProfileController::class,
-    ], ['except' => ['show']]);
+    Route::resource('dashboard', UserController::class)
+        ->except(['show'])
+        ->middleware('face.registered');
+    Route::resource('attendance', AttendanceController::class)
+        ->except(['show'])
+        ->middleware('face.registered');
+    Route::resource('locations', LocationController::class)
+        ->except(['show']);
+    Route::resource('logbook', LogbookController::class)
+        ->except(['show'])
+        ->middleware('face.registered');
+    Route::resource('reports', ReportController::class)
+        ->except(['show'])
+        ->middleware('face.registered');
+    Route::resource('profile', UserProfileController::class)
+        ->except(['show']);
 
     Route::get('/map', [LocationController::class, 'map'])->name('map.index');
     Route::get('/recap', [ReportController::class, 'recap'])->name('recap.index');

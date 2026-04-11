@@ -23,8 +23,8 @@
             :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
         >
             <div class="flex h-16 items-center justify-between border-b border-gray-200 px-6">
-                <div>
-                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-600">InternHub</p>
+                <div class="min-w-0">
+                    <img src="{{ asset('logo-internhub.png') }}" alt="Logo InternHub" class="h-7 w-auto object-contain">
                     <h1 class="text-lg font-bold text-gray-900">Pusat Kendali Admin</h1>
                 </div>
                 <button class="rounded-lg p-2 text-gray-500 hover:bg-gray-100 lg:hidden" @click="sidebarOpen = false">
