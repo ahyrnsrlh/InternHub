@@ -42,7 +42,10 @@ Route::prefix('internhub')->name('internhub.')->middleware(['auth', 'verified'])
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
         Route::get('/dashboard', [AdminPageController::class, 'dashboard'])->name('dashboard');
         Route::get('/interns', [AdminPageController::class, 'interns'])->name('interns');
+        Route::post('/interns', [AdminPageController::class, 'storeIntern'])->name('interns.store');
         Route::get('/interns/{intern}', [AdminPageController::class, 'internDetail'])->name('intern-detail');
+        Route::put('/interns/{internUser}', [AdminPageController::class, 'updateIntern'])->name('interns.update');
+        Route::delete('/interns/{internUser}', [AdminPageController::class, 'destroyIntern'])->name('interns.destroy');
         Route::get('/attendance', [AdminPageController::class, 'attendance'])->name('attendance');
         Route::get('/locations', [AdminPageController::class, 'locations'])->name('locations');
         Route::post('/locations', [AdminPageController::class, 'storeLocation'])->name('locations.store');

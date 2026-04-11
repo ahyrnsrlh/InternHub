@@ -51,7 +51,7 @@
                             @endif
                         </div>
 
-                        <button type="submit" class="w-full rounded-full bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800">Masuk</button>
+                        <button type="submit" class="w-full rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">Masuk</button>
                     </form>
 
                     <div class="my-7 flex items-center gap-3 text-xs text-gray-400">

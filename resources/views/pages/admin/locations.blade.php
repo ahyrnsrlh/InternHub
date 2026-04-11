@@ -25,9 +25,12 @@
             'status' => $location->status ?? 'active',
         ];
     })->values();
+    $updateRouteTemplate = route('internhub.admin.locations.update', ['location' => '__ID__']);
+    $deleteRouteTemplate = route('internhub.admin.locations.destroy', ['location' => '__ID__']);
 @endphp
 
 <script type="application/json" id="admin-locations-json">@json($locationPayload)</script>
+<script type="application/json" id="admin-locations-route-templates">@json(['update' => $updateRouteTemplate, 'delete' => $deleteRouteTemplate])</script>
 
 <div class="space-y-6" x-data="adminLocationsManager()" x-init="init()">
     <x-card>
@@ -87,13 +90,13 @@
                             type="button"
                             variant="secondary"
                             class="px-3 py-2"
-                            x-on:click="openEdit({ id: {{ $location->id }}, name: @js($location->name), address: @js($location->address), latitude: {{ (float) $location->latitude }}, longitude: {{ (float) $location->longitude }}, radius_meters: {{ (int) ($location->radius_meters ?? 100) }}, status: @js($location->status ?? 'active') })"
+                            x-on:click="openEditById({{ $location->id }})"
                         >Ubah</x-button>
                         <x-button
                             type="button"
                             variant="danger"
                             class="px-3 py-2"
-                            x-on:click="openDelete({ id: {{ $location->id }}, name: @js($location->name) })"
+                            x-on:click="openDeleteById({{ $location->id }})"
                         >Hapus</x-button>
                     </div>
                 </td>
@@ -208,15 +211,29 @@
                 id: null,
                 name: '',
             },
+            routeTemplates: {
+                update: '',
+                delete: '',
+            },
             get editFormAction() {
-                return this.editForm.id ? `/internhub/admin/locations/${this.editForm.id}` : '#';
+                if (!this.editForm.id || !this.routeTemplates.update) {
+                    return '#';
+                }
+
+                return this.routeTemplates.update.replace('__ID__', this.editForm.id);
             },
             get deleteFormAction() {
-                return this.deleteForm.id ? `/internhub/admin/locations/${this.deleteForm.id}` : '#';
+                if (!this.deleteForm.id || !this.routeTemplates.delete) {
+                    return '#';
+                }
+
+                return this.routeTemplates.delete.replace('__ID__', this.deleteForm.id);
             },
             init() {
                 const payloadElement = document.getElementById('admin-locations-json');
-                if (!payloadElement) {
+                const routeTemplateElement = document.getElementById('admin-locations-route-templates');
+
+                if (!payloadElement || !routeTemplateElement) {
                     return;
                 }
 
@@ -224,6 +241,12 @@
                     this.locations = JSON.parse(payloadElement.textContent || '[]');
                 } catch (error) {
                     this.locations = [];
+                }
+
+                try {
+                    this.routeTemplates = JSON.parse(routeTemplateElement.textContent || '{}');
+                } catch (error) {
+                    this.routeTemplates = { update: '', delete: '' };
                 }
 
                 this.renderMap();
@@ -300,12 +323,25 @@
                     this.map.fitBounds(bounds, { padding: [30, 30] });
                 }
             },
-            openEdit(location) {
+            openEditById(locationId) {
+                const location = this.locations.find((item) => Number(item.id) === Number(locationId));
+                if (!location) {
+                    return;
+                }
+
                 this.editForm = { ...location };
                 this.$dispatch('open-modal', 'edit-location');
             },
-            openDelete(location) {
-                this.deleteForm = { ...location };
+            openDeleteById(locationId) {
+                const location = this.locations.find((item) => Number(item.id) === Number(locationId));
+                if (!location) {
+                    return;
+                }
+
+                this.deleteForm = {
+                    id: location.id,
+                    name: location.name,
+                };
                 this.$dispatch('open-modal', 'delete-location');
             },
         };

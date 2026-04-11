@@ -24,9 +24,8 @@
         >
             <div class="flex h-16 items-center justify-between border-b border-gray-200 px-6">
                 <div class="min-w-0">
-                    <img src="{{ asset('logo-internhub.png') }}" alt="Logo InternHub" class="h-7 w-auto object-contain">
-                    <h1 class="text-lg font-bold text-gray-900">Pusat Kendali Admin</h1>
-                </div>
+                    <img src="{{ asset('logo-internhub.png') }}" alt="Logo InternHub" class="h-12 w-auto object-contain">
+                                    </div>
                 <button class="rounded-lg p-2 text-gray-500 hover:bg-gray-100 lg:hidden" @click="sidebarOpen = false">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
