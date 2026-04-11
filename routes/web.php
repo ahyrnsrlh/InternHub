@@ -83,6 +83,9 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
+    Route::post('/attendance/check-in', [AttendanceController::class, 'checkIn'])->name('attendance.check-in');
+    Route::patch('/attendance/check-out', [AttendanceController::class, 'checkOut'])->name('attendance.check-out');
+
     Route::resources([
         'dashboard' => UserController::class,
         'attendance' => AttendanceController::class,
