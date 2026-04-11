@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Location Management')
-@section('header', 'Locations')
+@section('title', 'Manajemen Lokasi Magang')
+@section('header', 'Lokasi Magang')
 
 @push('styles')
 <link
@@ -33,43 +33,43 @@
     <x-card>
         <div class="flex items-center justify-between">
             <div>
-                <h3 class="text-base font-semibold text-gray-900">Internship Locations</h3>
-                <p class="text-sm text-gray-500">Manage all approved work locations for GPS validation.</p>
+                <h3 class="text-base font-semibold text-gray-900">Lokasi Magang</h3>
+                <p class="text-sm text-gray-500">Kelola seluruh lokasi kerja yang disetujui untuk validasi GPS.</p>
             </div>
-            <x-button x-on:click="$dispatch('open-modal', 'add-location')">Add Location</x-button>
+            <x-button x-on:click="$dispatch('open-modal', 'add-location')">Tambah Lokasi</x-button>
         </div>
     </x-card>
 
     <x-card>
         <div class="flex flex-wrap items-center gap-3 text-sm">
-            <span class="font-semibold text-gray-700">Marker Filter:</span>
+            <span class="font-semibold text-gray-700">Filter Marker:</span>
             <label class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2">
                 <input type="checkbox" class="rounded border-gray-300 text-indigo-600" x-model="showActive" @change="renderMap()">
-                <span class="text-gray-700">Active</span>
+                <span class="text-gray-700">Aktif</span>
             </label>
             <label class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2">
                 <input type="checkbox" class="rounded border-gray-300 text-indigo-600" x-model="showInactive" @change="renderMap()">
-                <span class="text-gray-700">Inactive</span>
+                <span class="text-gray-700">Tidak Aktif</span>
             </label>
 
             <div class="ml-auto flex flex-wrap items-center gap-3">
                 <span class="inline-flex items-center gap-2">
                     <span class="h-3 w-3 rounded-full bg-green-600"></span>
-                    <span class="text-gray-600">Active</span>
+                    <span class="text-gray-600">Aktif</span>
                 </span>
                 <span class="inline-flex items-center gap-2">
                     <span class="h-3 w-3 rounded-full bg-gray-500"></span>
-                    <span class="text-gray-600">Inactive</span>
+                    <span class="text-gray-600">Tidak Aktif</span>
                 </span>
                 <span class="inline-flex items-center gap-2">
                     <span class="h-3 w-3 rounded-full border border-blue-600 bg-blue-100"></span>
-                    <span class="text-gray-600">Radius Circle</span>
+                    <span class="text-gray-600">Lingkar Radius</span>
                 </span>
             </div>
         </div>
     </x-card>
 
-    <x-table :headers="['Location Name', 'Address', 'Coordinates', 'Radius', 'Status', 'Action']">
+    <x-table :headers="['Nama Lokasi', 'Alamat', 'Koordinat', 'Radius', 'Status', 'Aksi']">
         @forelse ($locations as $location)
             <tr class="bg-white">
                 <td class="px-4 py-3 font-medium text-gray-900">{{ $location->name }}</td>
@@ -78,7 +78,7 @@
                 <td class="px-4 py-3 text-gray-700">{{ $location->radius_meters ?? 100 }} m</td>
                 <td class="px-4 py-3">
                     <span class="rounded-full px-2.5 py-1 text-xs font-semibold {{ ($location->status ?? 'active') === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700' }}">
-                        {{ ucfirst($location->status ?? 'active') }}
+                        {{ ($location->status ?? 'active') === 'active' ? 'Aktif' : 'Tidak Aktif' }}
                     </span>
                 </td>
                 <td class="px-4 py-3">
@@ -88,55 +88,55 @@
                             variant="secondary"
                             class="px-3 py-2"
                             x-on:click="openEdit({ id: {{ $location->id }}, name: @js($location->name), address: @js($location->address), latitude: {{ (float) $location->latitude }}, longitude: {{ (float) $location->longitude }}, radius_meters: {{ (int) ($location->radius_meters ?? 100) }}, status: @js($location->status ?? 'active') })"
-                        >Edit</x-button>
+                        >Ubah</x-button>
                         <x-button
                             type="button"
                             variant="danger"
                             class="px-3 py-2"
                             x-on:click="openDelete({ id: {{ $location->id }}, name: @js($location->name) })"
-                        >Delete</x-button>
+                        >Hapus</x-button>
                     </div>
                 </td>
             </tr>
         @empty
             <tr class="bg-white">
-                <td colspan="6" class="px-4 py-8 text-center text-sm text-gray-500">No locations available.</td>
+                <td colspan="6" class="px-4 py-8 text-center text-sm text-gray-500">Belum ada lokasi yang tersedia.</td>
             </tr>
         @endforelse
     </x-table>
 
-    <x-card title="Map Preview" subtitle="Leaflet marker overview of all registered locations.">
+    <x-card title="Pratinjau Peta" subtitle="Ikhtisar marker Leaflet untuk seluruh lokasi terdaftar.">
         @if ($locations->count())
             <div id="admin-locations-map" class="h-72 rounded-xl border border-gray-200"></div>
         @else
             <div class="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center text-sm text-gray-500">
-                No location data to preview on map.
+                Tidak ada data lokasi untuk ditampilkan pada peta.
             </div>
         @endif
     </x-card>
 
     <x-modal name="add-location" maxWidth="lg">
         <div class="p-6">
-            <h3 class="text-lg font-semibold text-gray-900">Add Location</h3>
+            <h3 class="text-lg font-semibold text-gray-900">Tambah Lokasi</h3>
             <form method="POST" action="{{ route('internhub.admin.locations.store') }}" class="mt-4 space-y-3">
                 @csrf
-                <x-input name="name" placeholder="Location name" required />
-                <x-input name="address" placeholder="Address" required />
+                <x-input name="name" placeholder="Nama lokasi" required />
+                <x-input name="address" placeholder="Alamat" required />
                 <div class="grid grid-cols-2 gap-3">
-                    <x-input name="latitude" type="number" step="0.0000001" placeholder="Latitude" required />
-                    <x-input name="longitude" type="number" step="0.0000001" placeholder="Longitude" required />
+                    <x-input name="latitude" type="number" step="0.0000001" placeholder="Lintang" required />
+                    <x-input name="longitude" type="number" step="0.0000001" placeholder="Bujur" required />
                 </div>
                 <div class="grid grid-cols-2 gap-3">
-                    <x-input name="radius_meters" type="number" placeholder="Radius meters" value="100" required />
+                    <x-input name="radius_meters" type="number" placeholder="Radius (meter)" value="100" required />
                     <select name="status" class="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-800 shadow-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
+                        <option value="active">Aktif</option>
+                        <option value="inactive">Tidak Aktif</option>
                     </select>
                 </div>
 
                 <div class="mt-6 flex justify-end gap-2">
-                    <x-button type="button" variant="secondary" x-on:click="$dispatch('close-modal', 'add-location')">Cancel</x-button>
-                    <x-button type="submit">Save</x-button>
+                    <x-button type="button" variant="secondary" x-on:click="$dispatch('close-modal', 'add-location')">Batal</x-button>
+                    <x-button type="submit">Simpan</x-button>
                 </div>
             </form>
         </div>
@@ -144,27 +144,27 @@
 
     <x-modal name="edit-location" maxWidth="lg">
         <div class="p-6">
-            <h3 class="text-lg font-semibold text-gray-900">Edit Location</h3>
+            <h3 class="text-lg font-semibold text-gray-900">Ubah Lokasi</h3>
             <form method="POST" :action="editFormAction" class="mt-4 space-y-3">
                 @csrf
                 @method('PUT')
-                <x-input name="name" x-model="editForm.name" placeholder="Location name" required />
-                <x-input name="address" x-model="editForm.address" placeholder="Address" required />
+                <x-input name="name" x-model="editForm.name" placeholder="Nama lokasi" required />
+                <x-input name="address" x-model="editForm.address" placeholder="Alamat" required />
                 <div class="grid grid-cols-2 gap-3">
-                    <x-input name="latitude" x-model="editForm.latitude" type="number" step="0.0000001" placeholder="Latitude" required />
-                    <x-input name="longitude" x-model="editForm.longitude" type="number" step="0.0000001" placeholder="Longitude" required />
+                    <x-input name="latitude" x-model="editForm.latitude" type="number" step="0.0000001" placeholder="Lintang" required />
+                    <x-input name="longitude" x-model="editForm.longitude" type="number" step="0.0000001" placeholder="Bujur" required />
                 </div>
                 <div class="grid grid-cols-2 gap-3">
-                    <x-input name="radius_meters" x-model="editForm.radius_meters" type="number" placeholder="Radius meters" required />
+                    <x-input name="radius_meters" x-model="editForm.radius_meters" type="number" placeholder="Radius (meter)" required />
                     <select name="status" x-model="editForm.status" class="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-800 shadow-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
+                        <option value="active">Aktif</option>
+                        <option value="inactive">Tidak Aktif</option>
                     </select>
                 </div>
 
                 <div class="mt-6 flex justify-end gap-2">
-                    <x-button type="button" variant="secondary" x-on:click="$dispatch('close-modal', 'edit-location')">Cancel</x-button>
-                    <x-button type="submit">Update</x-button>
+                    <x-button type="button" variant="secondary" x-on:click="$dispatch('close-modal', 'edit-location')">Batal</x-button>
+                    <x-button type="submit">Perbarui</x-button>
                 </div>
             </form>
         </div>
@@ -172,13 +172,13 @@
 
     <x-modal name="delete-location" maxWidth="md">
         <div class="p-6">
-            <h3 class="text-lg font-semibold text-gray-900">Delete Location</h3>
-            <p class="mt-2 text-sm text-gray-500">Are you sure to remove <span class="font-semibold text-gray-700" x-text="deleteForm.name"></span>?</p>
+            <h3 class="text-lg font-semibold text-gray-900">Hapus Lokasi</h3>
+            <p class="mt-2 text-sm text-gray-500">Apakah Anda yakin ingin menghapus <span class="font-semibold text-gray-700" x-text="deleteForm.name"></span>?</p>
             <form method="POST" :action="deleteFormAction" class="mt-6 flex justify-end gap-2">
                 @csrf
                 @method('DELETE')
-                <x-button type="button" variant="secondary" x-on:click="$dispatch('close-modal', 'delete-location')">Cancel</x-button>
-                <x-button type="submit" variant="danger">Delete</x-button>
+                <x-button type="button" variant="secondary" x-on:click="$dispatch('close-modal', 'delete-location')">Batal</x-button>
+                <x-button type="submit" variant="danger">Hapus</x-button>
             </form>
         </div>
     </x-modal>
@@ -281,7 +281,7 @@
                         weight: 2,
                     })
                         .addTo(this.map)
-                        .bindPopup(`<strong>${location.name}</strong><br>${location.address}<br>Status: ${location.status}<br>Radius: ${location.radius_meters} m`);
+                        .bindPopup(`<strong>${location.name}</strong><br>${location.address}<br>Status: ${location.status === 'active' ? 'Aktif' : 'Tidak Aktif'}<br>Radius: ${location.radius_meters} m`);
 
                     const radiusCircle = L.circle(latLng, {
                         radius: location.radius_meters,

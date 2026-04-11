@@ -29,7 +29,7 @@ class UserController extends Controller
     {
         $request->user()->update($request->validated());
 
-        return redirect()->route('user.dashboard.index')->with('status', 'Dashboard preferences saved.');
+        return redirect()->route('user.dashboard.index')->with('status', 'Preferensi beranda berhasil disimpan.');
     }
 
     public function edit(string $dashboard): View
@@ -47,7 +47,7 @@ class UserController extends Controller
 
         $user->update($request->validated());
 
-        return redirect()->route('user.dashboard.index')->with('status', 'Dashboard user data updated.');
+        return redirect()->route('user.dashboard.index')->with('status', 'Data pengguna pada beranda berhasil diperbarui.');
     }
 
     public function destroy(string $dashboard): RedirectResponse
@@ -57,6 +57,6 @@ class UserController extends Controller
 
         $user->update(['status' => 'inactive']);
 
-        return redirect()->route('user.dashboard.index')->with('status', 'Account status set to inactive.');
+        return redirect()->route('user.dashboard.index')->with('status', 'Status akun berhasil diubah menjadi tidak aktif.');
     }
 }

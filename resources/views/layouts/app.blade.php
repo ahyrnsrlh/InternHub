@@ -19,8 +19,8 @@
 @php
     $hideChrome = trim($__env->yieldContent('hide_chrome')) === '1';
     $activeMenu = trim($__env->yieldContent('active_menu')) ?: 'dashboard';
-    $navTitle = trim($__env->yieldContent('nav_title')) ?: 'Executive Portal';
-    $searchPlaceholder = trim($__env->yieldContent('search_placeholder')) ?: 'Search resources...';
+    $navTitle = trim($__env->yieldContent('nav_title')) ?: 'Portal Manajemen';
+    $searchPlaceholder = trim($__env->yieldContent('search_placeholder')) ?: 'Cari data...';
 @endphp
 <body class="@yield('body_class', 'internhub-shell text-content antialiased')">
     @if ($hideChrome)

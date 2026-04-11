@@ -49,7 +49,7 @@ class ReportController extends Controller
             'generatedAt' => now(),
         ])->setPaper('a4', 'portrait');
 
-        return $pdf->download('attendance-report-'.now()->format('YmdHis').'.pdf');
+        return $pdf->download('laporan-presensi-'.now()->format('YmdHis').'.pdf');
     }
 
     public function create(): View
@@ -66,7 +66,7 @@ class ReportController extends Controller
             'status' => $request->validated()['status'] ?? 'pending',
         ]);
 
-        return redirect()->route('user.reports.index')->with('status', 'Report saved successfully.');
+        return redirect()->route('user.reports.index')->with('status', 'Laporan berhasil disimpan.');
     }
 
     public function edit(string $report): View
@@ -88,7 +88,7 @@ class ReportController extends Controller
 
         $reportData->update($request->validated());
 
-        return redirect()->route('user.reports.index')->with('status', 'Report updated successfully.');
+        return redirect()->route('user.reports.index')->with('status', 'Laporan berhasil diperbarui.');
     }
 
     public function destroy(string $report): RedirectResponse
@@ -100,7 +100,7 @@ class ReportController extends Controller
 
         $reportData->delete();
 
-        return redirect()->route('user.reports.index')->with('status', 'Report deleted successfully.');
+        return redirect()->route('user.reports.index')->with('status', 'Laporan berhasil dihapus.');
     }
 
     public function recap(): View

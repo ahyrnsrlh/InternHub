@@ -26,7 +26,7 @@ class LocationController extends Controller
     {
         Location::query()->create($request->validated());
 
-        return redirect()->route('user.locations.index')->with('status', 'Location saved successfully.');
+        return redirect()->route('user.locations.index')->with('status', 'Lokasi berhasil disimpan.');
     }
 
     public function edit(string $location): View
@@ -41,7 +41,7 @@ class LocationController extends Controller
         $locationData = Location::query()->findOrFail($location);
         $locationData->update($request->validated());
 
-        return redirect()->route('user.locations.index')->with('status', 'Location updated successfully.');
+        return redirect()->route('user.locations.index')->with('status', 'Lokasi berhasil diperbarui.');
     }
 
     public function destroy(string $location): RedirectResponse
@@ -49,7 +49,7 @@ class LocationController extends Controller
         $locationData = Location::query()->findOrFail($location);
         $locationData->delete();
 
-        return redirect()->route('user.locations.index')->with('status', 'Location deleted successfully.');
+        return redirect()->route('user.locations.index')->with('status', 'Lokasi berhasil dihapus.');
     }
 
     public function map(): View

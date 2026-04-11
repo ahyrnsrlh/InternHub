@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'InternHub Admin')</title>
+    <title>@yield('title', 'InternHub Administrator')</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,7 +25,7 @@
             <div class="flex h-16 items-center justify-between border-b border-gray-200 px-6">
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-600">InternHub</p>
-                    <h1 class="text-lg font-bold text-gray-900">Admin Console</h1>
+                    <h1 class="text-lg font-bold text-gray-900">Pusat Kendali Admin</h1>
                 </div>
                 <button class="rounded-lg p-2 text-gray-500 hover:bg-gray-100 lg:hidden" @click="sidebarOpen = false">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -35,11 +35,11 @@
             <nav class="space-y-1 p-4">
                 @php
                     $menu = [
-                        ['label' => 'Dashboard', 'route' => 'internhub.admin.dashboard'],
-                        ['label' => 'Interns', 'route' => 'internhub.admin.interns'],
-                        ['label' => 'Attendance', 'route' => 'internhub.admin.attendance'],
-                        ['label' => 'Locations', 'route' => 'internhub.admin.locations'],
-                        ['label' => 'Reports', 'route' => 'internhub.admin.reports'],
+                        ['label' => 'Beranda', 'route' => 'internhub.admin.dashboard'],
+                        ['label' => 'Peserta Magang', 'route' => 'internhub.admin.interns'],
+                        ['label' => 'Kehadiran', 'route' => 'internhub.admin.attendance'],
+                        ['label' => 'Lokasi Magang', 'route' => 'internhub.admin.locations'],
+                        ['label' => 'Laporan', 'route' => 'internhub.admin.reports'],
                     ];
                 @endphp
 
@@ -58,7 +58,7 @@
                         <button class="rounded-lg p-2 text-gray-500 hover:bg-gray-100 lg:hidden" @click="sidebarOpen = true">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 6h16M4 12h16M4 18h16"/></svg>
                         </button>
-                        <h2 class="text-lg font-semibold text-gray-900">@yield('header', 'Admin Dashboard')</h2>
+                        <h2 class="text-lg font-semibold text-gray-900">@yield('header', 'Beranda Admin')</h2>
                     </div>
 
                     <div class="relative" x-data>
@@ -69,10 +69,10 @@
                         </button>
 
                         <div x-show="profileOpen" x-transition class="absolute right-0 z-30 mt-2 w-48 rounded-xl border border-gray-200 bg-white p-2 shadow-sm" @click.outside="profileOpen = false" style="display: none;">
-                            <a href="{{ route('profile.edit') }}" class="block rounded-lg px-3 py-2 text-sm text-gray-600 hover:bg-gray-100">Profile Settings</a>
+                            <a href="{{ route('profile.edit') }}" class="block rounded-lg px-3 py-2 text-sm text-gray-600 hover:bg-gray-100">Pengaturan Profil</a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <button type="submit" class="block w-full rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50">Sign Out</button>
+                                <button type="submit" class="block w-full rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50">Keluar</button>
                             </form>
                         </div>
                     </div>

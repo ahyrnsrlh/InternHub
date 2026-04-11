@@ -1,7 +1,7 @@
 @extends('layouts.user')
 
-@section('title', 'Attendance')
-@section('header', 'GPS Attendance')
+@section('title', 'Presensi')
+@section('header', 'Presensi Berbasis GPS')
 
 @push('styles')
 <link
@@ -51,12 +51,12 @@
         <input type="hidden" name="allowed_radius_meters" x-model="allowedRadius">
 
         <div class="grid gap-4 lg:grid-cols-2">
-            <x-card title="Location Validation" subtitle="Leaflet map with real-time radius validation.">
+            <x-card title="Validasi Lokasi" subtitle="Peta Leaflet dengan validasi radius secara real-time.">
                 <div class="space-y-4">
                     <div>
-                        <label class="mb-1 block text-sm font-medium text-gray-700">Internship Location</label>
+                        <label class="mb-1 block text-sm font-medium text-gray-700">Lokasi Magang</label>
                         <select x-model="selectedLocationId" @change="onLocationChanged" class="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-800 shadow-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100" x-bind:disabled="locations.length === 0">
-                            <option value="">Select location</option>
+                            <option value="">Pilih lokasi</option>
                             @foreach ($locations as $location)
                                 <option value="{{ $location->id }}" @selected(old('location_id') == $location->id)>
                                     {{ $location->name }} - {{ $location->address }}
@@ -80,7 +80,7 @@
                             <p class="mt-1 font-semibold text-gray-900" x-text="lng || '-' "></p>
                         </div>
                         <div class="rounded-xl border border-gray-200 bg-gray-50 p-3 sm:col-span-2">
-                            <p class="text-xs text-gray-500">Distance from internship location</p>
+                            <p class="text-xs text-gray-500">Jarak dari lokasi magang</p>
                             <p class="mt-1 font-semibold text-gray-900" x-text="distanceMeters !== null ? `${distanceMeters} m` : '-' "></p>
                         </div>
                     </div>
@@ -88,9 +88,9 @@
                     <div class="flex flex-wrap items-center gap-2">
                         <span class="rounded-full px-3 py-1 text-xs font-semibold"
                               :class="gpsValid ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
-                              x-text="gpsValid ? 'Inside Area' : 'Outside Area'"></span>
+                            x-text="gpsValid ? 'Di Dalam Area' : 'Di Luar Area'"></span>
                         <span class="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700" x-text="`Radius ${allowedRadius}m`"></span>
-                        <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700" x-show="gpsLoading">Reading GPS...</span>
+                        <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700" x-show="gpsLoading">Membaca GPS...</span>
                     </div>
 
                     <template x-if="gpsError">
@@ -99,7 +99,7 @@
                 </div>
             </x-card>
 
-            <x-card title="Face Validation" subtitle="Real-time face detection and descriptor matching.">
+            <x-card title="Validasi Wajah" subtitle="Deteksi wajah dan pencocokan deskriptor secara real-time.">
                 <div class="space-y-4">
                     <div class="relative overflow-hidden rounded-xl border border-gray-200 bg-black">
                         <video x-ref="video" autoplay muted playsinline class="h-80 w-full object-cover"></video>
@@ -108,25 +108,25 @@
 
                     <div class="flex flex-wrap gap-2">
                         <x-button type="button" variant="secondary" @click="startCamera" x-bind:disabled="cameraLoading">
-                            <span x-show="!cameraLoading">Start Camera</span>
-                            <span x-show="cameraLoading">Loading Camera...</span>
+                            <span x-show="!cameraLoading">Aktifkan Kamera</span>
+                            <span x-show="cameraLoading">Memuat Kamera...</span>
                         </x-button>
-                        <x-button type="button" @click="captureFace" x-bind:disabled="!faceDetected || cameraLoading || faceModelLoading">Capture Face</x-button>
+                        <x-button type="button" @click="captureFace" x-bind:disabled="!faceDetected || cameraLoading || faceModelLoading">Ambil Wajah</x-button>
                     </div>
 
                     <div class="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
                         <div class="rounded-xl border border-gray-200 bg-gray-50 p-3">
-                            <p class="text-xs text-gray-500">Face detected</p>
-                            <p class="mt-1 font-semibold" :class="faceDetected ? 'text-green-700' : 'text-gray-700'" x-text="faceDetected ? 'Detected' : 'Not detected'"></p>
+                            <p class="text-xs text-gray-500">Deteksi Wajah</p>
+                            <p class="mt-1 font-semibold" :class="faceDetected ? 'text-green-700' : 'text-gray-700'" x-text="faceDetected ? 'Terdeteksi' : 'Tidak terdeteksi'"></p>
                         </div>
                         <div class="rounded-xl border border-gray-200 bg-gray-50 p-3">
-                            <p class="text-xs text-gray-500">Face match status</p>
-                            <p class="mt-1 font-semibold" :class="faceMatched ? 'text-green-700' : 'text-red-700'" x-text="faceMatched ? 'Matched' : 'Not Matched'"></p>
+                            <p class="text-xs text-gray-500">Status Pencocokan Wajah</p>
+                            <p class="mt-1 font-semibold" :class="faceMatched ? 'text-green-700' : 'text-red-700'" x-text="faceMatched ? 'Sesuai' : 'Tidak Sesuai'"></p>
                         </div>
                     </div>
 
                     <template x-if="faceModelLoading">
-                        <p class="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-700">Loading face recognition models...</p>
+                        <p class="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-700">Memuat model pengenalan wajah...</p>
                     </template>
 
                     <template x-if="faceError">
@@ -136,14 +136,14 @@
             </x-card>
         </div>
 
-        <x-card class="mt-4" title="Check-In Action" subtitle="Check-in is enabled only when GPS and face validation are both successful.">
+        <x-card class="mt-4" title="Aksi Presensi Masuk" subtitle="Presensi masuk aktif jika validasi GPS dan wajah sama-sama berhasil.">
             <x-button type="submit" class="w-full justify-center" x-bind:disabled="!canCheckIn() || checkInLoading">
-                <span x-show="!checkInLoading">Check In</span>
-                <span x-show="checkInLoading">Processing Check-In...</span>
+                <span x-show="!checkInLoading">Presensi Masuk</span>
+                <span x-show="checkInLoading">Memproses Presensi Masuk...</span>
             </x-button>
 
             <p class="mt-3 text-xs text-gray-500">
-                Requirement: inside allowed GPS radius and successful face match.
+                Syarat: berada dalam radius GPS yang diizinkan dan pencocokan wajah berhasil.
             </p>
         </x-card>
     </form>
@@ -153,34 +153,34 @@
             @csrf
             @method('PATCH')
             <div>
-                <h3 class="text-lg font-semibold text-gray-900">Check Out</h3>
-                <p class="mt-1 text-sm text-gray-500">Close your active attendance session.</p>
+                <h3 class="text-lg font-semibold text-gray-900">Presensi Pulang</h3>
+                <p class="mt-1 text-sm text-gray-500">Tutup sesi presensi aktif Anda.</p>
             </div>
 
             <div class="rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm text-gray-600">
                 @if ($activeAttendance)
-                    Active check-in at: {{ optional($activeAttendance->check_in_time)->format('d M Y H:i') }}
+                    Presensi masuk aktif pada: {{ optional($activeAttendance->check_in_time)->format('d M Y H:i') }}
                 @else
-                    No active check-in.
+                    Tidak ada presensi masuk aktif.
                 @endif
             </div>
 
             <x-button type="submit" variant="secondary" class="w-full justify-center" x-bind:disabled="loadingCheckOut || {{ $activeAttendance ? 'false' : 'true' }}">
-                <span x-show="!loadingCheckOut">Check Out</span>
-                <span x-show="loadingCheckOut">Submitting...</span>
+                <span x-show="!loadingCheckOut">Presensi Pulang</span>
+                <span x-show="loadingCheckOut">Mengirim...</span>
             </x-button>
         </form>
     </x-card>
 
-    <x-card title="Attendance History">
+    <x-card title="Riwayat Kehadiran">
         @if ($attendances->count())
             <div class="overflow-hidden rounded-xl border border-gray-200">
                 <table class="min-w-full divide-y divide-gray-200 text-sm">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-4 py-3 text-left font-semibold text-gray-600">Check In</th>
-                            <th class="px-4 py-3 text-left font-semibold text-gray-600">Check Out</th>
-                            <th class="px-4 py-3 text-left font-semibold text-gray-600">Coordinates</th>
+                            <th class="px-4 py-3 text-left font-semibold text-gray-600">Presensi Masuk</th>
+                            <th class="px-4 py-3 text-left font-semibold text-gray-600">Presensi Pulang</th>
+                            <th class="px-4 py-3 text-left font-semibold text-gray-600">Koordinat</th>
                             <th class="px-4 py-3 text-left font-semibold text-gray-600">Status</th>
                         </tr>
                     </thead>
@@ -203,7 +203,7 @@
             <div class="mt-4">{{ $attendances->links() }}</div>
         @else
             <div class="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center text-sm text-gray-500">
-                No attendance data yet.
+                Belum ada data kehadiran.
             </div>
         @endif
     </x-card>
@@ -287,12 +287,12 @@ function attendanceValidation() {
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(this.map);
 
-            this.userMarker = L.marker([-6.2, 106.816666]).addTo(this.map).bindPopup('Your current location');
+            this.userMarker = L.marker([-6.2, 106.816666]).addTo(this.map).bindPopup('Lokasi Anda saat ini');
         },
 
         startGpsWatcher() {
             if (!navigator.geolocation) {
-                this.gpsError = 'GPS is not supported by your browser.';
+                this.gpsError = 'GPS tidak didukung oleh browser Anda.';
                 return;
             }
 
@@ -307,7 +307,7 @@ function attendanceValidation() {
                 },
                 (error) => {
                     this.gpsLoading = false;
-                    this.gpsError = error.message || 'Unable to read your GPS.';
+                    this.gpsError = error.message || 'Tidak dapat membaca GPS Anda.';
                     this.gpsValid = false;
                 },
                 {
@@ -349,7 +349,7 @@ function attendanceValidation() {
             const targetLatLng = [location.latitude, location.longitude];
 
             if (!this.targetMarker) {
-                this.targetMarker = L.marker(targetLatLng).addTo(this.map).bindPopup('Internship location');
+                this.targetMarker = L.marker(targetLatLng).addTo(this.map).bindPopup('Lokasi magang');
             } else {
                 this.targetMarker.setLatLng(targetLatLng);
             }
@@ -400,7 +400,7 @@ function attendanceValidation() {
 
         async loadFaceModels() {
             if (!window.faceapi) {
-                this.faceError = 'face-api.js library failed to load.';
+                this.faceError = 'Pustaka face-api.js gagal dimuat.';
                 return;
             }
 
@@ -430,7 +430,7 @@ function attendanceValidation() {
             this.faceModelLoading = false;
 
             if (!loaded) {
-                this.faceError = 'Unable to load face models. Please contact administrator.';
+                this.faceError = 'Model wajah tidak dapat dimuat. Silakan hubungi administrator.';
             }
         },
 
@@ -445,7 +445,7 @@ function attendanceValidation() {
                 await this.$refs.video.play();
                 this.startFaceDetectionLoop();
             } catch (error) {
-                this.faceError = 'Camera access denied or unavailable.';
+                this.faceError = 'Akses kamera ditolak atau tidak tersedia.';
             } finally {
                 this.cameraLoading = false;
             }
@@ -501,7 +501,7 @@ function attendanceValidation() {
 
         captureFace() {
             if (!this.latestDetection) {
-                this.faceError = 'No face detected. Please position your face in frame.';
+                this.faceError = 'Wajah tidak terdeteksi, silakan posisikan wajah dengan jelas di kamera.';
                 this.faceMatched = false;
                 this.capturedDescriptorJson = '';
                 return;
@@ -511,20 +511,20 @@ function attendanceValidation() {
             this.capturedDescriptorJson = JSON.stringify(descriptor);
 
             if (!Array.isArray(this.referenceDescriptor) || this.referenceDescriptor.length === 0) {
-                this.faceError = 'No registered reference face found for this account.';
+                this.faceError = 'Data wajah referensi belum tersedia untuk akun ini.';
                 this.faceMatched = false;
                 return;
             }
 
             if (this.referenceDescriptor.length !== descriptor.length) {
-                this.faceError = 'Descriptor dimension mismatch.';
+                this.faceError = 'Dimensi data wajah tidak sesuai.';
                 this.faceMatched = false;
                 return;
             }
 
             const distance = this.euclideanDistance(descriptor, this.referenceDescriptor);
             this.faceMatched = distance < 0.6;
-            this.faceError = this.faceMatched ? null : 'Face mismatch detected. Please retry capture.';
+            this.faceError = this.faceMatched ? null : 'Pencocokan wajah tidak sesuai. Silakan ambil ulang.';
         },
 
         euclideanDistance(a, b) {
@@ -550,6 +550,7 @@ function attendanceValidation() {
                 window.dispatchEvent(new CustomEvent('notify', {
                     detail: {
                         message: 'Check-in blocked. Ensure GPS is inside radius and face is matched.',
+                        message: 'Presensi masuk ditolak. Pastikan GPS berada dalam radius dan wajah berhasil dicocokkan.',
                         type: 'error',
                     },
                 }));

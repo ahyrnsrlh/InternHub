@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Register | InternHub')
+@section('title', 'Daftar | InternHub')
 @section('hide_chrome', '1')
 @section('body_class', 'internhub-shell text-content antialiased')
 @section('content_container_class', 'min-h-screen flex items-center justify-center px-4 py-12')
@@ -9,34 +9,34 @@
     <div class="w-full max-w-md">
         <div class="text-center mb-10">
             <div class="mx-auto h-14 w-14 rounded-xl bg-primary text-content-inverse grid place-content-center text-xl font-black">A</div>
-            <h1 class="text-2xl font-black mt-4">Join InternHub</h1>
-            <p class="text-xs uppercase tracking-[0.2em] text-content-muted mt-1">Executive Experience</p>
+            <h1 class="text-2xl font-black mt-4">Buat Akun InternHub</h1>
+            <p class="text-xs uppercase tracking-[0.2em] text-content-muted mt-1">Sistem Monitoring Magang</p>
         </div>
 
-        <x-card class="internhub-glass internhub-shadow" title="Request Registration" subtitle="Create your executive internship account.">
+        <x-card class="internhub-glass internhub-shadow" title="Formulir Pendaftaran" subtitle="Buat akun untuk sistem monitoring magang.">
             <form method="POST" action="{{ route('register') }}" class="space-y-5" x-data="registerFaceCapture()" x-init="init()" @submit.prevent="submitForm($event)">
                 @csrf
 
                 <label class="block text-xs font-bold uppercase tracking-widest text-content-muted space-y-2">
-                    Full Name
+                    Nama Lengkap
                     <input type="text" name="name" value="{{ old('name') }}" required autofocus autocomplete="name" class="w-full rounded-lg border-line bg-surface/80 text-sm" placeholder="Alex Carter">
                     <x-input-error :messages="$errors->get('name')" class="mt-2" />
                 </label>
 
                 <label class="block text-xs font-bold uppercase tracking-widest text-content-muted space-y-2">
-                    Work Email
+                    Email Aktif
                     <input type="email" name="email" value="{{ old('email') }}" required autocomplete="username" class="w-full rounded-lg border-line bg-surface/80 text-sm" placeholder="name@company.com">
                     <x-input-error :messages="$errors->get('email')" class="mt-2" />
                 </label>
 
                 <label class="block text-xs font-bold uppercase tracking-widest text-content-muted space-y-2">
-                    Password
+                    Kata Sandi
                     <input type="password" name="password" required autocomplete="new-password" class="w-full rounded-lg border-line bg-surface/80 text-sm" placeholder="••••••••">
                     <x-input-error :messages="$errors->get('password')" class="mt-2" />
                 </label>
 
                 <label class="block text-xs font-bold uppercase tracking-widest text-content-muted space-y-2">
-                    Confirm Password
+                    Konfirmasi Kata Sandi
                     <input type="password" name="password_confirmation" required autocomplete="new-password" class="w-full rounded-lg border-line bg-surface/80 text-sm" placeholder="••••••••">
                     <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
                 </label>
@@ -45,7 +45,7 @@
                 <input type="hidden" name="liveness_verified" :value="livenessVerified ? '1' : '0'">
 
                 <div class="rounded-xl border border-gray-200 bg-white p-4 space-y-3">
-                    <p class="text-xs font-bold uppercase tracking-widest text-content-muted">Face Verification</p>
+                    <p class="text-xs font-bold uppercase tracking-widest text-content-muted">Verifikasi Wajah</p>
 
                     <div class="relative overflow-hidden rounded-lg border-2 transition-colors"
                          :class="faceDetected ? 'border-green-500' : 'border-red-500'">
@@ -55,25 +55,25 @@
 
                     <div class="grid gap-2 text-xs sm:grid-cols-2">
                         <div class="rounded-md border border-gray-200 px-3 py-2">
-                            <p class="text-gray-500">Face status</p>
-                            <p class="font-semibold" :class="faceDetected ? 'text-green-600' : 'text-red-600'" x-text="faceDetected ? 'Face detected' : 'No face detected'"></p>
+                            <p class="text-gray-500">Status Wajah</p>
+                            <p class="font-semibold" :class="faceDetected ? 'text-green-600' : 'text-red-600'" x-text="faceDetected ? 'Wajah terdeteksi' : 'Wajah tidak terdeteksi'"></p>
                         </div>
                         <div class="rounded-md border border-gray-200 px-3 py-2">
-                            <p class="text-gray-500">Liveness</p>
-                            <p class="font-semibold" :class="livenessVerified ? 'text-green-600' : 'text-amber-600'" x-text="livenessVerified ? 'Verified' : 'Blink or move head'"></p>
+                            <p class="text-gray-500">Uji Liveness</p>
+                            <p class="font-semibold" :class="livenessVerified ? 'text-green-600' : 'text-amber-600'" x-text="livenessVerified ? 'Terverifikasi' : 'Berkedip atau gerakkan kepala'"></p>
                         </div>
                     </div>
 
                     <div class="flex flex-wrap gap-2">
                         <x-button type="button" variant="secondary" @click="startCamera" x-bind:disabled="cameraLoading">
-                            <span x-show="!cameraLoading">Start Camera</span>
-                            <span x-show="cameraLoading">Loading...</span>
+                            <span x-show="!cameraLoading">Aktifkan Kamera</span>
+                            <span x-show="cameraLoading">Memuat...</span>
                         </x-button>
-                        <x-button type="button" @click="captureFace" x-bind:disabled="!faceDetected || !livenessVerified || modelLoading">Capture Face</x-button>
+                        <x-button type="button" @click="captureFace" x-bind:disabled="!faceDetected || !livenessVerified || modelLoading">Ambil Wajah</x-button>
                     </div>
 
                     <template x-if="modelLoading">
-                        <p class="rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-700">Loading face model...</p>
+                        <p class="rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-700">Memuat model pengenalan wajah...</p>
                     </template>
                     <template x-if="faceError">
                         <p class="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700" x-text="faceError"></p>
@@ -83,12 +83,12 @@
                     <x-input-error :messages="$errors->get('liveness_verified')" class="mt-2" />
                 </div>
 
-                <x-button type="submit" class="w-full" x-bind:disabled="!faceCaptured">Create Account</x-button>
+                <x-button type="submit" class="w-full" x-bind:disabled="!faceCaptured">Daftarkan Akun</x-button>
             </form>
 
             <p class="mt-6 text-center text-sm text-content-muted">
-                Already registered?
-                <a href="{{ route('login') }}" class="font-semibold text-content hover:underline">Sign in here</a>
+                Sudah memiliki akun?
+                <a href="{{ route('login') }}" class="font-semibold text-content hover:underline">Masuk di sini</a>
             </p>
         </x-card>
     </div>
@@ -122,7 +122,7 @@
 
             async loadModels() {
                 if (!window.faceapi) {
-                    this.faceError = 'face-api library failed to load.';
+                    this.faceError = 'Pustaka face-api gagal dimuat.';
                     return;
                 }
 
@@ -150,7 +150,7 @@
                 }
 
                 if (!loaded) {
-                    this.faceError = 'Unable to load face models.';
+                    this.faceError = 'Model pengenalan wajah tidak dapat dimuat.';
                 }
 
                 this.modelLoading = false;
@@ -166,7 +166,7 @@
                     await this.$refs.video.play();
                     this.startDetectionLoop();
                 } catch (error) {
-                    this.faceError = 'Camera access is required for registration.';
+                    this.faceError = 'Akses kamera diperlukan untuk proses pendaftaran.';
                 } finally {
                     this.cameraLoading = false;
                 }
@@ -278,12 +278,12 @@
 
             captureFace() {
                 if (!this.faceDetected || !this.latestDescriptor) {
-                    this.faceError = 'Face not detected. Please face the camera.';
+                    this.faceError = 'Wajah tidak terdeteksi, silakan hadapkan wajah ke kamera.';
                     return;
                 }
 
                 if (!this.livenessVerified) {
-                    this.faceError = 'Liveness not verified. Please blink or move your head.';
+                    this.faceError = 'Verifikasi liveness belum berhasil. Silakan berkedip atau gerakkan kepala.';
                     return;
                 }
 
@@ -294,12 +294,12 @@
 
             submitForm(event) {
                 if (!this.faceCaptured) {
-                    this.faceError = 'Capture your face first before creating account.';
+                    this.faceError = 'Silakan ambil data wajah terlebih dahulu sebelum mendaftar.';
                     return;
                 }
 
                 if (!this.livenessVerified) {
-                    this.faceError = 'Liveness verification is required.';
+                    this.faceError = 'Verifikasi liveness wajib dilakukan.';
                     return;
                 }
 

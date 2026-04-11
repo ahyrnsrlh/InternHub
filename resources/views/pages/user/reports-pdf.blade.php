@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Attendance Report</title>
+    <title>Laporan Kehadiran</title>
     <style>
         body {
             font-family: DejaVu Sans, sans-serif;
@@ -75,20 +75,20 @@
 </head>
 <body>
     <div class="header">
-        <div class="title">Attendance Report</div>
-        <div class="meta">Intern: {{ $user->name }}</div>
+        <div class="title">Laporan Kehadiran</div>
+        <div class="meta">Peserta: {{ $user->name }}</div>
         <div class="meta">Email: {{ $user->email }}</div>
-        <div class="meta">Date Filter: {{ $filterDate ? \Illuminate\Support\Carbon::parse($filterDate)->format('d M Y') : 'All Dates' }}</div>
-        <div class="meta">Generated At: {{ $generatedAt->format('d M Y H:i') }}</div>
+        <div class="meta">Filter Tanggal: {{ $filterDate ? \Illuminate\Support\Carbon::parse($filterDate)->format('d M Y') : 'Semua Tanggal' }}</div>
+        <div class="meta">Dicetak Pada: {{ $generatedAt->format('d M Y H:i') }}</div>
     </div>
 
     <table class="summary">
         <tr>
-            <td class="label">Total Attendance</td>
+            <td class="label">Total Kehadiran</td>
             <td>{{ $summary['total_attendance'] }}</td>
         </tr>
         <tr>
-            <td class="label">Valid Attendance</td>
+            <td class="label">Kehadiran Valid</td>
             <td>{{ $summary['valid_attendance'] }}</td>
         </tr>
     </table>
@@ -96,10 +96,10 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Date</th>
-                <th>Location</th>
-                <th>Check-In</th>
-                <th>Check-Out</th>
+                <th>Tanggal</th>
+                <th>Lokasi</th>
+                <th>Presensi Masuk</th>
+                <th>Presensi Pulang</th>
                 <th>Status</th>
             </tr>
         </thead>
@@ -114,7 +114,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5">No attendance data found.</td>
+                    <td colspan="5">Data kehadiran tidak ditemukan.</td>
                 </tr>
             @endforelse
         </tbody>

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Register</title>
+    <title>Pendaftaran Pengguna</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,8 +14,8 @@
         <div class="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
             <div class="mb-6 text-center">
                 <p class="text-xs font-semibold uppercase tracking-[0.22em] text-indigo-600">InternHub</p>
-                <h1 class="mt-2 text-2xl font-bold text-gray-900">Create your account</h1>
-                <p class="mt-1 text-sm text-gray-500">Join the GPS-based internship monitoring system.</p>
+                <h1 class="mt-2 text-2xl font-bold text-gray-900">Buat akun Anda</h1>
+                <p class="mt-1 text-sm text-gray-500">Bergabung dengan sistem pemantauan magang berbasis GPS.</p>
             </div>
 
             <form class="space-y-4">
@@ -24,17 +24,17 @@
                     <x-input type="email" placeholder="you@example.com" />
                 </div>
                 <div>
-                    <label class="mb-1 block text-sm font-medium text-gray-700">Password</label>
-                    <x-input type="password" placeholder="Create password" />
+                    <label class="mb-1 block text-sm font-medium text-gray-700">Kata Sandi</label>
+                    <x-input type="password" placeholder="Buat kata sandi" />
                 </div>
                 <div>
-                    <label class="mb-1 block text-sm font-medium text-gray-700">Confirm Password</label>
-                    <x-input type="password" placeholder="Repeat password" />
+                    <label class="mb-1 block text-sm font-medium text-gray-700">Konfirmasi Kata Sandi</label>
+                    <x-input type="password" placeholder="Ulangi kata sandi" />
                 </div>
-                <x-button type="button" class="w-full justify-center">Register</x-button>
+                <x-button type="button" class="w-full justify-center">Daftar</x-button>
             </form>
 
-            <p class="mt-5 text-center text-sm text-gray-500">Already registered? <a href="{{ route('internhub.login') }}" class="font-semibold text-indigo-600 hover:text-indigo-700">Login</a></p>
+            <p class="mt-5 text-center text-sm text-gray-500">Sudah memiliki akun? <a href="{{ route('internhub.login') }}" class="font-semibold text-indigo-600 hover:text-indigo-700">Masuk</a></p>
         </div>
     </div>
 </body>

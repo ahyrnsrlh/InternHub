@@ -1,5 +1,5 @@
 <div
-    x-data="{ show: false, message: 'Action completed successfully', type: 'success' }"
+    x-data="{ show: false, message: 'Berhasil disimpan', type: 'success' }"
     x-on:notify.window="show = true; message = $event.detail.message || message; type = $event.detail.type || 'success'; setTimeout(() => show = false, 2500)"
     x-show="show"
     x-transition:enter="transition ease-out duration-200"

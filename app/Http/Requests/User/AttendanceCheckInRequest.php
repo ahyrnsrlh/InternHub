@@ -26,11 +26,11 @@ class AttendanceCheckInRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'location_id.required' => 'Please select a location before check-in.',
-            'location_id.exists' => 'Selected location is not valid.',
-            'latitude.required' => 'Latitude is required for GPS validation.',
-            'longitude.required' => 'Longitude is required for GPS validation.',
-            'face_descriptor.required' => 'Face validation data is required before check-in.',
+            'location_id.required' => 'Silakan pilih lokasi sebelum presensi masuk.',
+            'location_id.exists' => 'Lokasi yang dipilih tidak valid.',
+            'latitude.required' => 'Latitude wajib diisi untuk validasi GPS.',
+            'longitude.required' => 'Longitude wajib diisi untuk validasi GPS.',
+            'face_descriptor.required' => 'Data validasi wajah wajib dilengkapi sebelum presensi masuk.',
         ];
     }
 }

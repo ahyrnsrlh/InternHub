@@ -34,7 +34,7 @@ class LogbookController extends Controller
             'status' => $request->validated()['status'] ?? 'pending',
         ]);
 
-        return redirect()->route('user.logbook.index')->with('status', 'Logbook entry saved successfully.');
+        return redirect()->route('user.logbook.index')->with('status', 'Catatan harian berhasil disimpan.');
     }
 
     public function edit(string $logbook): View
@@ -56,7 +56,7 @@ class LogbookController extends Controller
 
         $log->update($request->validated());
 
-        return redirect()->route('user.logbook.index')->with('status', 'Logbook entry updated successfully.');
+        return redirect()->route('user.logbook.index')->with('status', 'Catatan harian berhasil diperbarui.');
     }
 
     public function destroy(string $logbook): RedirectResponse
@@ -68,6 +68,6 @@ class LogbookController extends Controller
 
         $log->delete();
 
-        return redirect()->route('user.logbook.index')->with('status', 'Logbook entry deleted successfully.');
+        return redirect()->route('user.logbook.index')->with('status', 'Catatan harian berhasil dihapus.');
     }
 }

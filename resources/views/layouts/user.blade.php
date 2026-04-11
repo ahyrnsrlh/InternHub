@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'InternHub User')</title>
+    <title>@yield('title', 'InternHub Peserta')</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -42,9 +42,9 @@
             <div class="flex h-16 items-center justify-between border-b border-gray-200 px-6">
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-600">InternHub</p>
-                    <h1 class="text-lg font-bold text-gray-900">GPS Internship</h1>
+                    <h1 class="text-lg font-bold text-gray-900">Portal Peserta Magang</h1>
                 </div>
-                <button class="rounded-lg p-2 text-gray-500 hover:bg-gray-100 lg:hidden" @click="sidebarOpen = false" aria-label="Close sidebar">
+                        <button class="rounded-lg p-2 text-gray-500 hover:bg-gray-100 lg:hidden" @click="sidebarOpen = false" aria-label="Tutup sidebar">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
@@ -52,14 +52,14 @@
             <nav class="space-y-1 p-4">
                 @php
                     $menu = [
-                        ['label' => 'Dashboard', 'route' => 'user.dashboard.index', 'icon' => 'home'],
-                        ['label' => 'Attendance', 'route' => 'user.attendance.index', 'icon' => 'clock'],
-                        ['label' => 'Locations', 'route' => 'user.locations.index', 'icon' => 'pin'],
-                        ['label' => 'Map', 'route' => 'user.map.index', 'icon' => 'map'],
-                        ['label' => 'Logbook', 'route' => 'user.logbook.index', 'icon' => 'book'],
-                        ['label' => 'Reports', 'route' => 'user.reports.index', 'icon' => 'table'],
-                        ['label' => 'Recap', 'route' => 'user.recap.index', 'icon' => 'chart'],
-                        ['label' => 'Profile', 'route' => 'user.profile.index', 'icon' => 'user'],
+                        ['label' => 'Beranda', 'route' => 'user.dashboard.index', 'icon' => 'home'],
+                        ['label' => 'Presensi', 'route' => 'user.attendance.index', 'icon' => 'clock'],
+                        ['label' => 'Lokasi Magang', 'route' => 'user.locations.index', 'icon' => 'pin'],
+                        ['label' => 'Peta Lokasi', 'route' => 'user.map.index', 'icon' => 'map'],
+                        ['label' => 'Catatan Harian', 'route' => 'user.logbook.index', 'icon' => 'book'],
+                        ['label' => 'Laporan', 'route' => 'user.reports.index', 'icon' => 'table'],
+                        ['label' => 'Rekap', 'route' => 'user.recap.index', 'icon' => 'chart'],
+                        ['label' => 'Profil', 'route' => 'user.profile.index', 'icon' => 'user'],
                     ];
                 @endphp
 
@@ -98,23 +98,23 @@
             <header class="sticky top-0 z-20 border-b border-gray-200 bg-white/90 backdrop-blur">
                 <div class="flex h-16 items-center justify-between px-4 sm:px-6">
                     <div class="flex items-center gap-3">
-                        <button class="rounded-lg p-2 text-gray-500 hover:bg-gray-100 lg:hidden" @click="sidebarOpen = true" aria-label="Open sidebar">
+                        <button class="rounded-lg p-2 text-gray-500 hover:bg-gray-100 lg:hidden" @click="sidebarOpen = true" aria-label="Buka sidebar">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 6h16M4 12h16M4 18h16" /></svg>
                         </button>
-                        <h2 class="text-lg font-semibold text-gray-900">@yield('header', 'Intern Dashboard')</h2>
+                        <h2 class="text-lg font-semibold text-gray-900">@yield('header', 'Beranda Peserta')</h2>
                     </div>
 
                     <div class="relative flex items-center gap-3">
                         <button class="rounded-full border border-gray-200 bg-white p-2 text-gray-500 hover:border-indigo-200 hover:text-indigo-600">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0a3 3 0 11-6 0" /></svg>
                         </button>
-                        <button class="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700" @click="profileOpen = !profileOpen" aria-label="Open profile menu"></button>
+                        <button class="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700" @click="profileOpen = !profileOpen" aria-label="Buka menu profil"></button>
 
                         <div x-show="profileOpen" x-transition class="absolute right-0 top-12 z-30 w-52 rounded-xl border border-gray-200 bg-white p-2 shadow-sm" @click.outside="profileOpen = false" style="display: none;">
-                            <a href="{{ route('user.profile.index') }}" class="block rounded-lg px-3 py-2 text-sm text-gray-600 hover:bg-gray-100">Profile</a>
+                            <a href="{{ route('user.profile.index') }}" class="block rounded-lg px-3 py-2 text-sm text-gray-600 hover:bg-gray-100">Profil</a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <button type="submit" class="block w-full rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50">Sign Out</button>
+                                <button type="submit" class="block w-full rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50">Keluar</button>
                             </form>
                         </div>
                     </div>

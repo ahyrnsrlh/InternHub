@@ -19,7 +19,7 @@ class FaceService
                 'is_match' => false,
                 'distance' => null,
                 'threshold' => $threshold,
-                'message' => 'No registered face descriptor found for this user.',
+                'message' => 'Deskriptor wajah pengguna belum terdaftar.',
             ];
         }
 
@@ -29,7 +29,7 @@ class FaceService
                 'is_match' => false,
                 'distance' => null,
                 'threshold' => $threshold,
-                'message' => 'Invalid captured face descriptor payload.',
+                'message' => 'Data deskriptor wajah yang ditangkap tidak valid.',
             ];
         }
 
@@ -38,7 +38,7 @@ class FaceService
                 'is_match' => false,
                 'distance' => null,
                 'threshold' => $threshold,
-                'message' => 'Face descriptor dimensions do not match.',
+                'message' => 'Dimensi deskriptor wajah tidak sesuai.',
             ];
         }
 
@@ -49,8 +49,8 @@ class FaceService
             'distance' => $distance,
             'threshold' => $threshold,
             'message' => $distance < $threshold
-                ? 'Face successfully matched.'
-                : 'Face mismatch. Please retry with better lighting and camera angle.',
+                ? 'Wajah berhasil dicocokkan.'
+                : 'Wajah tidak cocok. Silakan ulangi dengan pencahayaan dan sudut kamera yang lebih baik.',
         ];
     }
 

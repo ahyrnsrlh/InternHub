@@ -94,7 +94,7 @@ class AttendanceController extends Controller
             'status' => $status,
         ]);
 
-        return redirect()->route('user.attendance.index')->with('status', 'Attendance updated successfully.');
+        return redirect()->route('user.attendance.index')->with('status', 'Data kehadiran berhasil diperbarui.');
     }
 
     public function checkIn(AttendanceCheckInRequest $request): RedirectResponse|JsonResponse
@@ -114,7 +114,7 @@ class AttendanceController extends Controller
                 ->first();
 
             if (! $activeAttendance) {
-                return $this->respondError('No active check-in found. Please check in first.', $request->expectsJson(), 422);
+                return $this->respondError('Tidak ada presensi masuk aktif. Silakan lakukan presensi masuk terlebih dahulu.', $request->expectsJson(), 422);
             }
 
             $validated = $request->validated();
@@ -123,14 +123,14 @@ class AttendanceController extends Controller
                 'check_out_time' => $validated['check_out_time'] ?? now(),
             ]);
 
-            return $this->respondSuccess('Check-out recorded successfully.', $request->expectsJson(), [
+            return $this->respondSuccess('Presensi pulang berhasil dicatat.', $request->expectsJson(), [
                 'attendance_id' => $activeAttendance->id,
                 'check_out_time' => $activeAttendance->check_out_time,
             ]);
         } catch (Throwable $exception) {
             report($exception);
 
-            return $this->respondError('Failed to process check-out. Please try again.', $request->expectsJson());
+            return $this->respondError('Gagal memproses presensi pulang. Silakan coba lagi.', $request->expectsJson());
         }
     }
 
@@ -143,7 +143,7 @@ class AttendanceController extends Controller
 
         $attendanceRecord->delete();
 
-        return redirect()->route('user.attendance.index')->with('status', 'Attendance deleted successfully.');
+        return redirect()->route('user.attendance.index')->with('status', 'Data kehadiran berhasil dihapus.');
     }
 
     private function checkInFromPayload(array $validated, bool $expectsJson = false): RedirectResponse|JsonResponse
@@ -158,11 +158,11 @@ class AttendanceController extends Controller
                 ->exists();
 
             if ($activeAttendanceExists) {
-                return $this->respondError('You already have an active check-in. Please check out first.', $expectsJson, 422);
+                return $this->respondError('Anda masih memiliki presensi masuk aktif. Silakan lakukan presensi pulang terlebih dahulu.', $expectsJson, 422);
             }
 
             if (empty($validated['face_descriptor'])) {
-                return $this->respondError('Face validation is required before check-in.', $expectsJson, 422);
+                return $this->respondError('Validasi wajah wajib dilakukan sebelum presensi masuk.', $expectsJson, 422);
             }
 
             $location = Location::query()->findOrFail($validated['location_id']);
@@ -195,8 +195,8 @@ class AttendanceController extends Controller
 
             return $this->respondSuccess(
                 $status === 'valid'
-                    ? 'Check-in recorded. Location and face verification passed.'
-                    : 'Check-in recorded with invalid status. GPS or face verification failed.',
+                    ? 'Presensi masuk berhasil dicatat. Verifikasi lokasi dan wajah berhasil.'
+                    : 'Presensi masuk tercatat dengan status tidak valid. Validasi GPS atau wajah gagal.',
                 $expectsJson,
                 [
                     'attendance_id' => $attendance->id,
@@ -213,7 +213,7 @@ class AttendanceController extends Controller
         } catch (Throwable $exception) {
             report($exception);
 
-            return $this->respondError('Failed to process check-in. Please try again.', $expectsJson);
+            return $this->respondError('Gagal memproses presensi masuk. Silakan coba lagi.', $expectsJson);
         }
     }
 

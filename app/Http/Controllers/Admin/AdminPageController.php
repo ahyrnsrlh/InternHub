@@ -81,21 +81,21 @@ class AdminPageController extends Controller
     {
         Location::query()->create($request->validated());
 
-        return redirect()->route('internhub.admin.locations')->with('status', 'Location created successfully.');
+        return redirect()->route('internhub.admin.locations')->with('status', 'Lokasi magang berhasil ditambahkan.');
     }
 
     public function updateLocation(LocationManagementRequest $request, Location $location): RedirectResponse
     {
         $location->update($request->validated());
 
-        return redirect()->route('internhub.admin.locations')->with('status', 'Location updated successfully.');
+        return redirect()->route('internhub.admin.locations')->with('status', 'Lokasi magang berhasil diperbarui.');
     }
 
     public function destroyLocation(Location $location): RedirectResponse
     {
         $location->delete();
 
-        return redirect()->route('internhub.admin.locations')->with('status', 'Location deleted successfully.');
+        return redirect()->route('internhub.admin.locations')->with('status', 'Lokasi magang berhasil dihapus.');
     }
 
     public function reports(): View

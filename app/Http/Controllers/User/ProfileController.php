@@ -27,7 +27,7 @@ class ProfileController extends Controller
     {
         $request->user()->update($request->validated());
 
-        return redirect()->route('user.profile.index')->with('status', 'Profile saved successfully.');
+        return redirect()->route('user.profile.index')->with('status', 'Profil berhasil disimpan.');
     }
 
     public function edit(string $profile): View
@@ -45,7 +45,7 @@ class ProfileController extends Controller
 
         $user->update($request->validated());
 
-        return redirect()->route('user.profile.index')->with('status', 'Profile updated successfully.');
+        return redirect()->route('user.profile.index')->with('status', 'Profil berhasil diperbarui.');
     }
 
     public function destroy(string $profile): RedirectResponse
@@ -55,6 +55,6 @@ class ProfileController extends Controller
 
         $user->delete();
 
-        return redirect('/')->with('status', 'Profile deleted successfully.');
+        return redirect('/')->with('status', 'Profil berhasil dihapus.');
     }
 }

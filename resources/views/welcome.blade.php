@@ -13,19 +13,19 @@
     <main class="mx-auto flex min-h-screen w-full max-w-5xl flex-col items-center justify-center px-6 py-16">
         <div class="w-full rounded-3xl border border-line bg-surface p-10 shadow-xl shadow-content/5">
             <p class="inline-flex rounded-full bg-primary-soft px-4 py-1 text-xs font-bold uppercase tracking-widest text-content-muted">InternHub</p>
-            <h1 class="mt-6 text-4xl font-black tracking-tight text-content sm:text-5xl">Modern internship operations, one workspace.</h1>
-            <p class="mt-4 max-w-2xl text-base text-content-muted sm:text-lg">Portal ini sudah memakai design system warna semantik, siap dark mode, dan terhubung ke modul dashboard, attendance, logbook, review, serta admin center.</p>
+            <h1 class="mt-6 text-4xl font-black tracking-tight text-content sm:text-5xl">Operasional magang modern dalam satu ruang kerja.</h1>
+            <p class="mt-4 max-w-2xl text-base text-content-muted sm:text-lg">Portal ini menggunakan sistem desain warna semantik, siap mode gelap, dan terhubung ke modul beranda, presensi, catatan harian, evaluasi, serta pusat admin.</p>
 
             <div class="mt-10 flex flex-wrap items-center gap-3">
                 @auth
-                    <a href="{{ url('/dashboard') }}" class="inline-flex items-center rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary-hover">Open Dashboard</a>
+                    <a href="{{ url('/dashboard') }}" class="inline-flex items-center rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary-hover">Buka Beranda</a>
                 @else
-                    <a href="{{ route('login') }}" class="inline-flex items-center rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary-hover">Sign In</a>
+                    <a href="{{ route('login') }}" class="inline-flex items-center rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary-hover">Masuk</a>
                     @if (Route::has('register'))
-                        <a href="{{ route('register') }}" class="inline-flex items-center rounded-xl border border-line px-5 py-2.5 text-sm font-semibold text-content hover:bg-surface-muted">Create Account</a>
+                        <a href="{{ route('register') }}" class="inline-flex items-center rounded-xl border border-line px-5 py-2.5 text-sm font-semibold text-content hover:bg-surface-muted">Buat Akun</a>
                     @endif
                 @endauth
-                <a href="{{ route('internhub.dashboard') }}" class="inline-flex items-center rounded-xl border border-line px-5 py-2.5 text-sm font-semibold text-content hover:bg-surface-muted">Preview InternHub</a>
+                <a href="{{ route('internhub.dashboard') }}" class="inline-flex items-center rounded-xl border border-line px-5 py-2.5 text-sm font-semibold text-content hover:bg-surface-muted">Pratinjau InternHub</a>
             </div>
         </div>
     </main>

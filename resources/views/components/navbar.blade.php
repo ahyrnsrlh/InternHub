@@ -1,6 +1,6 @@
 @props([
-    'title' => 'Executive Portal',
-    'searchPlaceholder' => 'Search records...',
+    'title' => 'Portal Presensi Magang',
+    'searchPlaceholder' => 'Cari data...',
     'showLinks' => true,
 ])
 
@@ -20,8 +20,8 @@
         <div class="flex items-center gap-4 lg:gap-6">
             @if ($showLinks)
                 <nav class="hidden lg:flex items-center gap-4 text-sm font-medium text-content-muted">
-                    <a href="#" class="hover:text-content transition-colors">Help</a>
-                    <a href="#" class="hover:text-content transition-colors">Docs</a>
+                    <a href="#" class="hover:text-content transition-colors">Bantuan</a>
+                    <a href="#" class="hover:text-content transition-colors">Dokumentasi</a>
                 </nav>
             @endif
             <button class="text-content-muted hover:text-content-muted transition-colors" type="button">
@@ -31,7 +31,7 @@
                 <span class="material-symbols-outlined">settings</span>
             </button>
             <div class="hidden sm:flex items-center gap-2 border-l border-line pl-4">
-                <span class="text-sm font-semibold text-content-muted">Profile</span>
+                <span class="text-sm font-semibold text-content-muted">Profil</span>
                 <span class="h-8 w-8 rounded-full bg-primary text-content-inverse grid place-content-center text-xs font-bold">AC</span>
             </div>
         </div>
