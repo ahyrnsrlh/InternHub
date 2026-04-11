@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Models\Attendance;
 use App\Models\DailyLog;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\ReportRequest;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
@@ -14,14 +17,39 @@ class ReportController extends Controller
     public function index(): View
     {
         $filterDate = request()->query('date');
+        $reportQuery = $this->attendanceReportQuery($filterDate);
 
-        $reports = DailyLog::query()
-            ->where('user_id', Auth::id())
-            ->when($filterDate, fn ($query) => $query->whereDate('log_date', $filterDate))
-            ->latest('log_date')
-            ->paginate(10);
+        $reports = $reportQuery->paginate(10)->withQueryString();
 
-        return view('pages.user.reports', compact('reports', 'filterDate'));
+        $summaryQuery = $this->attendanceReportQuery($filterDate);
+        $summary = [
+            'total_attendance' => (clone $summaryQuery)->count(),
+            'valid_attendance' => (clone $summaryQuery)->where('status', 'valid')->count(),
+        ];
+
+        return view('pages.user.reports', compact('reports', 'filterDate', 'summary'));
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $filterDate = $request->query('date');
+        $reports = $this->attendanceReportQuery($filterDate)->get();
+
+        $summaryQuery = $this->attendanceReportQuery($filterDate);
+        $summary = [
+            'total_attendance' => (clone $summaryQuery)->count(),
+            'valid_attendance' => (clone $summaryQuery)->where('status', 'valid')->count(),
+        ];
+
+        $pdf = Pdf::loadView('pages.user.reports-pdf', [
+            'reports' => $reports,
+            'summary' => $summary,
+            'filterDate' => $filterDate,
+            'user' => $request->user(),
+            'generatedAt' => now(),
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->download('attendance-report-'.now()->format('YmdHis').'.pdf');
     }
 
     public function create(): View
@@ -84,5 +112,14 @@ class ReportController extends Controller
         ];
 
         return view('pages.user.recap', compact('recap'));
+    }
+
+    private function attendanceReportQuery(?string $filterDate)
+    {
+        return Attendance::query()
+            ->with('location')
+            ->where('user_id', Auth::id())
+            ->when($filterDate, fn ($query) => $query->whereDate('check_in_time', $filterDate))
+            ->latest('check_in_time');
     }
 }
