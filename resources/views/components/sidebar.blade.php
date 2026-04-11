@@ -6,7 +6,7 @@
     $menuItems = [
         ['key' => 'dashboard', 'label' => 'Beranda', 'icon' => 'dashboard', 'route' => 'internhub.dashboard'],
         ['key' => 'attendance', 'label' => 'Presensi', 'icon' => 'calendar_today', 'route' => 'internhub.attendance'],
-        ['key' => 'logbook', 'label' => 'Catatan Harian', 'icon' => 'auto_stories', 'route' => 'internhub.daily-logbook'],
+        ['key' => 'logbook', 'label' => 'Laporan Harian', 'icon' => 'auto_stories', 'route' => 'internhub.daily-logbook'],
         ['key' => 'registration', 'label' => 'Pendaftaran Lokasi', 'icon' => 'app_registration', 'route' => 'internhub.registration'],
         ['key' => 'reviews', 'label' => 'Ulasan Pembimbing', 'icon' => 'rate_review', 'route' => 'internhub.mentor-review'],
         ['key' => 'administration', 'label' => 'Pusat Admin', 'icon' => 'admin_panel_settings', 'route' => 'internhub.admin-center'],

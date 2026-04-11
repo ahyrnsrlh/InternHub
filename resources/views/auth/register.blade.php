@@ -44,13 +44,13 @@
                         <button type="submit" class="w-full rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">Daftarkan Akun</button>
                     </form>
 
-                    <p class="mt-7 text-center text-sm text-gray-500">Sudah memiliki akun? <a href="{{ route('login') }}" class="font-semibold text-emerald-700 hover:text-emerald-800">Masuk sekarang</a></p>
+                    <p class="mt-7 text-center text-sm text-gray-500">Sudah memiliki akun? <a href="{{ route('login') }}" class="font-semibold text-blue-600 hover:text-blue-800">Masuk sekarang</a></p>
                 </div>
             </section>
 
-            <section class="hidden bg-[#eef3ee] p-8 lg:block xl:p-10">
-                <div class="h-full rounded-3xl border border-[#dfe8df] bg-[#edf3ed] p-5">
-                    <img src="{{ asset('illustrasi.png') }}" alt="Ilustrasi InternHub" class="h-full w-full rounded-2xl object-cover">
+            <section class="hidden bg-[#eef0f3] p-8 lg:block xl:p-10">
+                <div class="h-full rounded-3xl border border-[#dfe1e8] bg-[#ededf3] p-5">
+                    <img src="{{ asset('illustrasi.png') }}" alt="Ilustrasi InternHub" class="h-13 w-full rounded-2xl object-cover">
                 </div>
             </section>
         </div>

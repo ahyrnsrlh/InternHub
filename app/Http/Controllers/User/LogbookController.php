@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\User;
 
-use App\Models\DailyLog;
+use App\Models\Attendance;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\User\LogbookRequest;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
 class LogbookController extends Controller
@@ -18,65 +18,48 @@ class LogbookController extends Controller
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');
 
-        $logs = DailyLog::query()
+        $logs = Attendance::query()
+            ->with('location:id,name,address')
             ->where('user_id', Auth::id())
-            ->when($startDate, fn ($query) => $query->whereDate('log_date', '>=', $startDate))
-            ->when($endDate, fn ($query) => $query->whereDate('log_date', '<=', $endDate))
-            ->latest('log_date')
+            ->whereNotNull('check_in_time')
+            ->when($startDate, fn ($query) => $query->whereDate('check_in_time', '>=', $startDate))
+            ->when($endDate, fn ($query) => $query->whereDate('check_in_time', '<=', $endDate))
+            ->latest('check_in_time')
             ->paginate(10)
             ->withQueryString();
 
         return view('pages.user.logbook', compact('logs'));
     }
 
-    public function create(): View
+    public function create(): RedirectResponse
     {
-        return view('pages.user.logbook');
+        return redirect()->route('user.logbook.index');
     }
 
-    public function store(LogbookRequest $request): RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
-        DailyLog::query()->create([
-            ...$request->validated(),
-            'user_id' => $request->user()->id,
-            'status' => $request->validated()['status'] ?? 'pending',
+        return redirect()->route('user.logbook.index')->withErrors([
+            'logbook' => 'Laporan Harian diambil otomatis dari data presensi. Input manual tidak diperlukan.',
         ]);
-
-        return redirect()->route('user.logbook.index')->with('status', 'Catatan harian berhasil disimpan.');
     }
 
-    public function edit(string $logbook): View
+    public function edit(string $logbook): RedirectResponse
     {
-        $log = DailyLog::query()
-            ->where('id', $logbook)
-            ->where('user_id', Auth::id())
-            ->firstOrFail();
-
-        return view('pages.user.logbook', compact('log'));
+        return redirect()->route('user.logbook.index');
     }
 
-    public function update(LogbookRequest $request, string $logbook): RedirectResponse
+    public function update(Request $request, string $logbook): RedirectResponse
     {
-        $log = DailyLog::query()
-            ->where('id', $logbook)
-            ->where('user_id', $request->user()->id)
-            ->firstOrFail();
-
-        $log->update($request->validated());
-
-        return redirect()->route('user.logbook.index')->with('status', 'Catatan harian berhasil diperbarui.');
+        return redirect()->route('user.logbook.index')->withErrors([
+            'logbook' => 'Laporan Harian diambil otomatis dari data presensi dan tidak dapat diedit manual.',
+        ]);
     }
 
     public function destroy(string $logbook): RedirectResponse
     {
-        $log = DailyLog::query()
-            ->where('id', $logbook)
-            ->where('user_id', Auth::id())
-            ->firstOrFail();
-
-        $log->delete();
-
-        return redirect()->route('user.logbook.index')->with('status', 'Catatan harian berhasil dihapus.');
+        return redirect()->route('user.logbook.index')->withErrors([
+            'logbook' => 'Laporan Harian mengikuti data presensi dan tidak dapat dihapus manual.',
+        ]);
     }
 
     public function exportPdf(Request $request)
@@ -84,17 +67,28 @@ class LogbookController extends Controller
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');
 
-        $logs = DailyLog::query()
+        $logs = Attendance::query()
+            ->with('location:id,name,address')
             ->where('user_id', Auth::id())
-            ->when($startDate, fn ($query) => $query->whereDate('log_date', '>=', $startDate))
-            ->when($endDate, fn ($query) => $query->whereDate('log_date', '<=', $endDate))
-            ->latest('log_date')
+            ->whereNotNull('check_in_time')
+            ->when($startDate, fn ($query) => $query->whereDate('check_in_time', '>=', $startDate))
+            ->when($endDate, fn ($query) => $query->whereDate('check_in_time', '<=', $endDate))
+            ->latest('check_in_time')
             ->get();
+
+        $totalHours = $logs->sum(function (Attendance $attendance): float {
+            if (! $attendance->check_in_time || ! $attendance->check_out_time) {
+                return 0;
+            }
+
+            return max(0, Carbon::parse($attendance->check_in_time)->floatDiffInHours(Carbon::parse($attendance->check_out_time)));
+        });
 
         $summary = [
             'total_logs' => $logs->count(),
-            'total_hours' => (float) $logs->sum('hours'),
-            'approved_logs' => $logs->where('status', 'approved')->count(),
+            'total_hours' => (float) $totalHours,
+            'valid_logs' => $logs->where('status', 'valid')->count(),
+            'invalid_logs' => $logs->where('status', 'invalid')->count(),
         ];
 
         $pdf = Pdf::loadView('pages.user.logbook-pdf', [

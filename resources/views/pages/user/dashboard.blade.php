@@ -20,7 +20,7 @@
     <section class="rounded-2xl border border-indigo-100 bg-gradient-to-r from-indigo-600 to-indigo-500 p-6 text-white shadow-sm">
         <p class="text-sm text-indigo-100">Selamat datang kembali, Peserta Magang</p>
         <h1 class="mt-1 text-2xl font-bold">Sistem Monitoring Magang Berbasis GPS</h1>
-        <p class="mt-2 max-w-2xl text-sm text-indigo-100">Kelola presensi, catatan harian, dan perkembangan magang dalam satu portal terintegrasi.</p>
+        <p class="mt-2 max-w-2xl text-sm text-indigo-100">Kelola presensi, Laporan Harian, dan perkembangan magang dalam satu portal terintegrasi.</p>
     </section>
 
     <section class="grid gap-4 sm:grid-cols-2">

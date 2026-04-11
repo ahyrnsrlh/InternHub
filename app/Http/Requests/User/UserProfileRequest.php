@@ -20,9 +20,10 @@ class UserProfileRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($profileId ?: $this->user()?->id)],
-            'title' => ['nullable', 'string', 'max:255'],
-            'department' => ['nullable', 'string', 'max:255'],
-            'placement' => ['nullable', 'string', 'max:255'],
+            'npm' => ['required', 'string', 'max:50'],
+            'institution_name' => ['required', 'string', 'max:255'],
+            'academic_supervisor' => ['required', 'string', 'max:255'],
+            'field_supervisor' => ['required', 'string', 'max:255'],
             'status' => ['nullable', 'in:active,inactive,on_leave'],
             'location_tracking_enabled' => ['nullable', 'boolean'],
         ];

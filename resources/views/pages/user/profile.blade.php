@@ -25,6 +25,8 @@
 
                     <p class="mt-4 text-sm font-semibold text-gray-800">{{ $user->name ?? 'Pengguna' }}</p>
                     <p class="text-xs text-gray-500">{{ $user->email ?? '-' }}</p>
+                    <p class="mt-1 text-xs text-gray-500">NPM: {{ $user->npm ?? '-' }}</p>
+                    <p class="text-xs text-gray-500">Instansi: {{ $user->institution_name ?? '-' }}</p>
 
                     <div class="mt-4">
                         @if ($user?->face_registered)
@@ -56,16 +58,24 @@
                         <x-input-error :messages="$errors->get('email')" class="mt-2" />
                     </div>
                     <div>
-                        <label class="mb-1 block text-sm font-medium text-gray-700">Jabatan</label>
-                        <input name="title" type="text" value="{{ old('title', $user->title) }}" class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
+                        <label class="mb-1 block text-sm font-medium text-gray-700">NPM</label>
+                        <input name="npm" type="text" value="{{ old('npm', $user->npm) }}" class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
+                        <x-input-error :messages="$errors->get('npm')" class="mt-2" />
                     </div>
                     <div>
-                        <label class="mb-1 block text-sm font-medium text-gray-700">Departemen</label>
-                        <input name="department" type="text" value="{{ old('department', $user->department) }}" class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
+                        <label class="mb-1 block text-sm font-medium text-gray-700">Nama Instansi</label>
+                        <input name="institution_name" type="text" value="{{ old('institution_name', $user->institution_name) }}" class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
+                        <x-input-error :messages="$errors->get('institution_name')" class="mt-2" />
                     </div>
-                    <div class="sm:col-span-2">
-                        <label class="mb-1 block text-sm font-medium text-gray-700">Penempatan</label>
-                        <input name="placement" type="text" value="{{ old('placement', $user->placement) }}" class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
+                    <div>
+                        <label class="mb-1 block text-sm font-medium text-gray-700">Dosen Pembimbing</label>
+                        <input name="academic_supervisor" type="text" value="{{ old('academic_supervisor', $user->academic_supervisor) }}" class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
+                        <x-input-error :messages="$errors->get('academic_supervisor')" class="mt-2" />
+                    </div>
+                    <div>
+                        <label class="mb-1 block text-sm font-medium text-gray-700">Pembimbing Lapangan</label>
+                        <input name="field_supervisor" type="text" value="{{ old('field_supervisor', $user->field_supervisor) }}" class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
+                        <x-input-error :messages="$errors->get('field_supervisor')" class="mt-2" />
                     </div>
                     <div class="sm:col-span-2 rounded-xl border border-gray-200 bg-gray-50 p-4">
                         <label class="inline-flex items-start gap-3">

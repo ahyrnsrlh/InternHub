@@ -70,8 +70,12 @@
             <td>{{ number_format($summary['total_hours'], 2) }} jam</td>
         </tr>
         <tr>
-            <td class="label">Catatan Disetujui</td>
-            <td>{{ $summary['approved_logs'] }}</td>
+            <td class="label">Presensi Valid</td>
+            <td>{{ $summary['valid_logs'] }}</td>
+        </tr>
+        <tr>
+            <td class="label">Presensi Tidak Valid</td>
+            <td>{{ $summary['invalid_logs'] }}</td>
         </tr>
     </table>
 
@@ -79,26 +83,28 @@
         <thead>
             <tr>
                 <th>Tanggal</th>
-                <th>Departemen</th>
-                <th>Aktivitas</th>
-                <th>Deliverable</th>
-                <th>Durasi</th>
+                <th>Jam Masuk</th>
+                <th>Jam Pulang</th>
+                <th>Rencana Kegiatan</th>
+                <th>Realisasi Kegiatan</th>
+                <th>Lokasi</th>
                 <th>Status</th>
             </tr>
         </thead>
         <tbody>
             @forelse($logs as $log)
                 <tr>
-                    <td>{{ optional($log->log_date)->format('d M Y') }}</td>
-                    <td>{{ $log->department }}</td>
-                    <td>{{ $log->summary }}</td>
-                    <td>{{ $log->deliverable ?: '-' }}</td>
-                    <td>{{ number_format((float) $log->hours, 2) }} jam</td>
+                    <td>{{ optional($log->check_in_time)->format('d M Y') }}</td>
+                    <td>{{ optional($log->check_in_time)->format('H:i') ?: '-' }}</td>
+                    <td>{{ optional($log->check_out_time)->format('H:i') ?: '-' }}</td>
+                    <td>{{ $log->check_in_note ?: '-' }}</td>
+                    <td>{{ $log->check_out_note ?: '-' }}</td>
+                    <td>{{ $log->location?->name ?: '-' }}</td>
                     <td>{{ ucfirst((string) $log->status) }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6">Data aktivitas tidak ditemukan.</td>
+                    <td colspan="7">Data Laporan Harian dari presensi tidak ditemukan.</td>
                 </tr>
             @endforelse
         </tbody>

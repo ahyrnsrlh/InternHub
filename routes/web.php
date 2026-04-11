@@ -64,7 +64,7 @@ Route::prefix('internhub')->name('internhub.')->middleware(['auth', 'verified'])
         Route::view('/attendance', 'pages.user.attendance')->middleware('face.registered')->name('attendance');
         Route::view('/locations', 'pages.user.locations')->name('locations');
         Route::view('/map', 'pages.user.map')->name('map');
-        Route::view('/logbook', 'pages.user.logbook')->middleware('face.registered')->name('logbook');
+        Route::get('/logbook', [LogbookController::class, 'index'])->middleware('face.registered')->name('logbook');
         Route::view('/reports', 'pages.user.reports')->middleware('face.registered')->name('reports');
         Route::view('/recap', 'pages.user.recap')->name('recap');
         Route::view('/profile', 'pages.user.profile')->name('profile');

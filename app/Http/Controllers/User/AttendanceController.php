@@ -36,6 +36,7 @@ class AttendanceController extends Controller
             ->paginate(10);
 
         $locations = Location::query()
+            ->where('user_id', Auth::id())
             ->orderBy('name')
             ->get(['id', 'name', 'address', 'latitude', 'longitude', 'radius_meters', 'status']);
 
@@ -131,6 +132,7 @@ class AttendanceController extends Controller
 
             $activeAttendance->update([
                 'check_out_time' => $validated['check_out_time'] ?? now(),
+                'check_out_note' => $validated['realization_note'],
             ]);
 
             $requestUser = $request->user();
@@ -190,10 +192,25 @@ class AttendanceController extends Controller
                 return $this->respondError('Koordinat GPS tidak valid. Silakan aktifkan layanan lokasi perangkat.', $expectsJson, 422);
             }
 
-            $location = Location::query()->findOrFail($validated['location_id']);
+            $location = Location::query()
+                ->where('user_id', $userId)
+                ->latest('id')
+                ->first();
+
+            if (! $location) {
+                return $this->respondError('Lokasi magang belum diatur. Silakan isi lokasi magang terlebih dahulu.', $expectsJson, 422);
+            }
 
             if (($location->status ?? 'active') !== 'active') {
                 return $this->respondError('Lokasi presensi tidak aktif dan tidak dapat digunakan.', $expectsJson, 422);
+            }
+
+            if (! empty($validated['location_id']) && (int) $validated['location_id'] !== (int) $location->id) {
+                Log::warning('Attendance location tampering attempt detected', [
+                    'user_id' => $userId,
+                    'client_location_id' => (int) $validated['location_id'],
+                    'db_location_id' => (int) $location->id,
+                ]);
             }
 
             $authoritativeRadius = (float) ($location->radius_meters ?? 100);
@@ -223,6 +240,14 @@ class AttendanceController extends Controller
 
             $status = ($gpsValidation['is_valid'] && $faceValidation['is_match']) ? 'valid' : 'invalid';
 
+            if (! $faceValidation['is_match']) {
+                return $this->respondError(
+                    'Validasi wajah tidak sesuai. Silakan ambil foto ulang dengan posisi wajah yang jelas.',
+                    $expectsJson,
+                    422
+                );
+            }
+
             Log::info('Attendance GPS validation', [
                 'user_id' => $userId,
                 'location_id' => $location->id,
@@ -235,11 +260,12 @@ class AttendanceController extends Controller
                 'status' => $status,
             ]);
 
-            $attendance = DB::transaction(function () use ($validated, $userId, $status) {
+            $attendance = DB::transaction(function () use ($validated, $userId, $status, $location) {
                 return Attendance::query()->create([
                     'user_id' => $userId,
-                    'location_id' => $validated['location_id'],
+                    'location_id' => $location->id,
                     'check_in_time' => $validated['check_in_time'] ?? now(),
+                    'check_in_note' => $validated['plan_note'],
                     'latitude' => $validated['latitude'],
                     'longitude' => $validated['longitude'],
                     'status' => $status,
@@ -251,7 +277,7 @@ class AttendanceController extends Controller
                     'Presensi Masuk',
                     $status === 'valid'
                         ? 'Presensi masuk berhasil dan tervalidasi.'
-                        : 'Presensi masuk tercatat tetapi validasi GPS atau wajah tidak memenuhi syarat.',
+                        : 'Presensi masuk tercatat tetapi lokasi berada di luar radius, sehingga statusnya tidak valid.',
                     [
                         'attendance_id' => $attendance->id,
                         'status' => $status,
@@ -263,7 +289,7 @@ class AttendanceController extends Controller
             return $this->respondSuccess(
                 $status === 'valid'
                     ? 'Presensi masuk berhasil dicatat. Verifikasi lokasi dan wajah berhasil.'
-                    : 'Presensi masuk tercatat dengan status tidak valid. Validasi GPS atau wajah gagal.',
+                    : 'Presensi masuk tercatat dengan status tidak valid karena lokasi berada di luar radius.',
                 $expectsJson,
                 [
                     'attendance_id' => $attendance->id,
