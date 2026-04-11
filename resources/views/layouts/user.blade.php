@@ -26,7 +26,7 @@
 
     @stack('styles')
 </head>
-<body class="bg-gray-50 text-gray-800 antialiased" x-data="{ sidebarOpen: false }">
+<body class="bg-gray-50 text-gray-800 antialiased" x-data="{ sidebarOpen: false, profileOpen: false }">
     <div class="min-h-screen">
         <div
             x-show="sidebarOpen"
@@ -104,11 +104,19 @@
                         <h2 class="text-lg font-semibold text-gray-900">@yield('header', 'Intern Dashboard')</h2>
                     </div>
 
-                    <div class="flex items-center gap-3">
+                    <div class="relative flex items-center gap-3">
                         <button class="rounded-full border border-gray-200 bg-white p-2 text-gray-500 hover:border-indigo-200 hover:text-indigo-600">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0a3 3 0 11-6 0" /></svg>
                         </button>
-                        <div class="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700"></div>
+                        <button class="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700" @click="profileOpen = !profileOpen" aria-label="Open profile menu"></button>
+
+                        <div x-show="profileOpen" x-transition class="absolute right-0 top-12 z-30 w-52 rounded-xl border border-gray-200 bg-white p-2 shadow-sm" @click.outside="profileOpen = false" style="display: none;">
+                            <a href="{{ route('user.profile.index') }}" class="block rounded-lg px-3 py-2 text-sm text-gray-600 hover:bg-gray-100">Profile</a>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="block w-full rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50">Sign Out</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -120,6 +128,37 @@
     </div>
 
     <x-toast />
+
+    <div
+        id="flash-data"
+        hidden
+        data-status="{{ session('status', '') }}"
+        data-error="{{ session('error') ?? ($errors->any() ? $errors->first() : '') }}"
+    ></div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const flash = document.getElementById('flash-data');
+            if (!flash) {
+                return;
+            }
+
+            const status = flash.dataset.status;
+            const error = flash.dataset.error;
+
+            if (status) {
+                window.dispatchEvent(new CustomEvent('notify', {
+                    detail: { message: status, type: 'success' }
+                }));
+            }
+
+            if (error) {
+                window.dispatchEvent(new CustomEvent('notify', {
+                    detail: { message: error, type: 'error' }
+                }));
+            }
+        });
+    </script>
 
     @stack('scripts')
 </body>

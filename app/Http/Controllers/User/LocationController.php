@@ -54,7 +54,7 @@ class LocationController extends Controller
 
     public function map(): View
     {
-        $locations = Location::query()->where('is_active', true)->get();
+        $locations = Location::query()->orderBy('name')->get();
 
         return view('pages.user.map', compact('locations'));
     }

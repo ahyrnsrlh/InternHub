@@ -68,8 +68,11 @@
                         </button>
 
                         <div x-show="profileOpen" x-transition class="absolute right-0 z-30 mt-2 w-48 rounded-xl border border-gray-200 bg-white p-2 shadow-sm" @click.outside="profileOpen = false" style="display: none;">
-                            <a href="#" class="block rounded-lg px-3 py-2 text-sm text-gray-600 hover:bg-gray-100">Profile Settings</a>
-                            <a href="#" class="block rounded-lg px-3 py-2 text-sm text-gray-600 hover:bg-gray-100">Sign Out</a>
+                            <a href="{{ route('profile.edit') }}" class="block rounded-lg px-3 py-2 text-sm text-gray-600 hover:bg-gray-100">Profile Settings</a>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="block w-full rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50">Sign Out</button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -80,5 +83,38 @@
             </main>
         </div>
     </div>
+
+    <x-toast />
+
+    <div
+        id="flash-data"
+        hidden
+        data-status="{{ session('status', '') }}"
+        data-error="{{ session('error') ?? ($errors->any() ? $errors->first() : '') }}"
+    ></div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const flash = document.getElementById('flash-data');
+            if (!flash) {
+                return;
+            }
+
+            const status = flash.dataset.status;
+            const error = flash.dataset.error;
+
+            if (status) {
+                window.dispatchEvent(new CustomEvent('notify', {
+                    detail: { message: status, type: 'success' }
+                }));
+            }
+
+            if (error) {
+                window.dispatchEvent(new CustomEvent('notify', {
+                    detail: { message: error, type: 'error' }
+                }));
+            }
+        });
+    </script>
 </body>
 </html>
