@@ -9,6 +9,8 @@ use App\Http\Controllers\User\ReportController;
 use App\Http\Controllers\User\ProfileController as UserProfileController;
 use App\Http\Controllers\User\LogbookController;
 use App\Http\Controllers\User\LocationController;
+use App\Http\Controllers\User\NotificationController;
+use App\Http\Controllers\User\LocationTrackingController;
 use App\Http\Controllers\User\AttendanceController;
 use Illuminate\Support\Facades\Route;
 
@@ -33,7 +35,7 @@ Route::prefix('internhub')->name('internhub.')->middleware(['auth', 'verified'])
         }
 
         if ($user?->hasRole(User::ROLE_INTERN, User::ROLE_USER)) {
-            return view('pages.user.dashboard');
+            return redirect()->route('user.dashboard.index');
         }
 
         abort(403);
@@ -88,9 +90,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::prefix('user')->name('user.')->middleware(['auth', 'verified', 'role:intern,user'])->group(function () {
     Route::post('/profile/face', [UserProfileController::class, 'storeFace'])->name('profile.face.store');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    Route::post('/location-tracking', [LocationTrackingController::class, 'store'])->name('location-tracking.store');
     Route::post('/attendance/check-in', [AttendanceController::class, 'checkIn'])->middleware('face.registered')->name('attendance.check-in');
     Route::patch('/attendance/check-out', [AttendanceController::class, 'checkOut'])->middleware('face.registered')->name('attendance.check-out');
     Route::get('/reports/export/pdf', [ReportController::class, 'exportPdf'])->middleware('face.registered')->name('reports.export.pdf');
+    Route::get('/logbook/export/pdf', [LogbookController::class, 'exportPdf'])->middleware('face.registered')->name('logbook.export.pdf');
 
     Route::resource('dashboard', UserController::class)
         ->except(['show'])

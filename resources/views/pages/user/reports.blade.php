@@ -18,21 +18,29 @@
                     <label class="mb-1 block text-sm font-medium text-gray-700">Filter Tanggal</label>
                     <x-input type="date" name="date" :value="$filterDate" />
                 </div>
+                <div>
+                    <label class="mb-1 block text-sm font-medium text-gray-700">Dari Tanggal</label>
+                    <x-input type="date" name="start_date" :value="$startDate" />
+                </div>
+                <div>
+                    <label class="mb-1 block text-sm font-medium text-gray-700">Sampai Tanggal</label>
+                    <x-input type="date" name="end_date" :value="$endDate" />
+                </div>
                 <x-button variant="secondary" type="submit">Terapkan Filter</x-button>
-                @if($filterDate)
+                @if($filterDate || $startDate || $endDate)
                     <a href="{{ route('user.reports.index') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-700">Reset</a>
                 @endif
             </div>
 
             <div>
-                <a href="{{ route('user.reports.export.pdf', ['date' => $filterDate]) }}" class="inline-flex items-center rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800">
+                <a href="{{ route('user.reports.export.pdf', ['date' => $filterDate, 'start_date' => $startDate, 'end_date' => $endDate]) }}" class="inline-flex items-center rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800">
                     Unduh PDF
                 </a>
             </div>
         </form>
     </x-card>
 
-    <section class="grid gap-4 sm:grid-cols-2">
+    <section class="grid gap-4 sm:grid-cols-3">
         <x-card>
             <p class="text-sm text-gray-500">Total Kehadiran</p>
             <p class="mt-2 text-2xl font-bold text-gray-900">{{ $summary['total_attendance'] }}</p>
@@ -40,6 +48,10 @@
         <x-card>
             <p class="text-sm text-gray-500">Kehadiran Valid</p>
             <p class="mt-2 text-2xl font-bold text-green-700">{{ $summary['valid_attendance'] }}</p>
+        </x-card>
+        <x-card>
+            <p class="text-sm text-gray-500">Kehadiran Tidak Valid</p>
+            <p class="mt-2 text-2xl font-bold text-red-700">{{ $summary['invalid_attendance'] }}</p>
         </x-card>
     </section>
 

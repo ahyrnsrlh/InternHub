@@ -28,7 +28,10 @@ class ProfileController extends Controller
 
     public function store(UserProfileRequest $request): RedirectResponse
     {
-        $request->user()->update($request->validated());
+        $payload = $request->validated();
+        $payload['location_tracking_enabled'] = $request->boolean('location_tracking_enabled');
+
+        $request->user()->update($payload);
 
         return redirect()->route('user.profile.index')->with('status', 'Profil berhasil disimpan.');
     }
@@ -46,7 +49,10 @@ class ProfileController extends Controller
         $user = User::query()->findOrFail($profile);
         abort_unless($user->id === (int) $request->user()->id, 403);
 
-        $user->update($request->validated());
+        $payload = $request->validated();
+        $payload['location_tracking_enabled'] = $request->boolean('location_tracking_enabled');
+
+        $user->update($payload);
 
         return redirect()->route('user.profile.index')->with('status', 'Profil berhasil diperbarui.');
     }

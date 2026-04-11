@@ -17,34 +17,42 @@ class ReportController extends Controller
     public function index(): View
     {
         $filterDate = request()->query('date');
-        $reportQuery = $this->attendanceReportQuery($filterDate);
+        $startDate = request()->query('start_date');
+        $endDate = request()->query('end_date');
+        $reportQuery = $this->attendanceReportQuery($filterDate, $startDate, $endDate);
 
         $reports = $reportQuery->paginate(10)->withQueryString();
 
-        $summaryQuery = $this->attendanceReportQuery($filterDate);
+        $summaryQuery = $this->attendanceReportQuery($filterDate, $startDate, $endDate);
         $summary = [
             'total_attendance' => (clone $summaryQuery)->count(),
             'valid_attendance' => (clone $summaryQuery)->where('status', 'valid')->count(),
+            'invalid_attendance' => (clone $summaryQuery)->where('status', 'invalid')->count(),
         ];
 
-        return view('pages.user.reports', compact('reports', 'filterDate', 'summary'));
+        return view('pages.user.reports', compact('reports', 'filterDate', 'startDate', 'endDate', 'summary'));
     }
 
     public function exportPdf(Request $request)
     {
         $filterDate = $request->query('date');
-        $reports = $this->attendanceReportQuery($filterDate)->get();
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
+        $reports = $this->attendanceReportQuery($filterDate, $startDate, $endDate)->get();
 
-        $summaryQuery = $this->attendanceReportQuery($filterDate);
+        $summaryQuery = $this->attendanceReportQuery($filterDate, $startDate, $endDate);
         $summary = [
             'total_attendance' => (clone $summaryQuery)->count(),
             'valid_attendance' => (clone $summaryQuery)->where('status', 'valid')->count(),
+            'invalid_attendance' => (clone $summaryQuery)->where('status', 'invalid')->count(),
         ];
 
         $pdf = Pdf::loadView('pages.user.reports-pdf', [
             'reports' => $reports,
             'summary' => $summary,
             'filterDate' => $filterDate,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
             'user' => $request->user(),
             'generatedAt' => now(),
         ])->setPaper('a4', 'portrait');
@@ -114,12 +122,14 @@ class ReportController extends Controller
         return view('pages.user.recap', compact('recap'));
     }
 
-    private function attendanceReportQuery(?string $filterDate)
+    private function attendanceReportQuery(?string $filterDate, ?string $startDate = null, ?string $endDate = null)
     {
         return Attendance::query()
             ->with('location')
             ->where('user_id', Auth::id())
             ->when($filterDate, fn ($query) => $query->whereDate('check_in_time', $filterDate))
+            ->when($startDate, fn ($query) => $query->whereDate('check_in_time', '>=', $startDate))
+            ->when($endDate, fn ($query) => $query->whereDate('check_in_time', '<=', $endDate))
             ->latest('check_in_time');
     }
 }

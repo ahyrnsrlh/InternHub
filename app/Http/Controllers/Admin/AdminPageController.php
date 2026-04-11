@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\LocationManagementRequest;
+use App\Models\Attendance;
+use App\Models\DailyLog;
 use App\Models\Location;
 use App\Models\User;
+use Illuminate\Support\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -16,43 +19,73 @@ class AdminPageController extends Controller
 {
     public function dashboard(): View
     {
+        $today = now()->toDateString();
+
+        $totalInterns = User::query()
+            ->whereIn('role', [User::ROLE_INTERN, User::ROLE_USER])
+            ->count();
+
+        $activeInterns = User::query()
+            ->whereIn('role', [User::ROLE_INTERN, User::ROLE_USER])
+            ->where('status', 'active')
+            ->count();
+
+        $attendanceToday = Attendance::query()
+            ->whereDate('check_in_time', $today)
+            ->count();
+
+        $validAttendanceToday = Attendance::query()
+            ->whereDate('check_in_time', $today)
+            ->where('status', 'valid')
+            ->count();
+
+        $invalidAttendanceToday = max(0, $attendanceToday - $validAttendanceToday);
+        $attendanceRate = $attendanceToday > 0
+            ? round(($validAttendanceToday / $attendanceToday) * 100, 1)
+            : 0;
+
+        $recentActivitiesCount = DailyLog::query()
+            ->whereDate('log_date', '>=', now()->subDays(7)->toDateString())
+            ->count();
+
         $summary = [
-            'totalInterns' => 128,
-            'attendanceToday' => 94,
-            'activeInterns' => 117,
-            'attendanceRate' => 73,
+            'totalInterns' => $totalInterns,
+            'attendanceToday' => $attendanceToday,
+            'activeInterns' => $activeInterns,
+            'attendanceRate' => $attendanceRate,
+            'validAttendanceToday' => $validAttendanceToday,
+            'invalidAttendanceToday' => $invalidAttendanceToday,
+            'recentActivitiesCount' => $recentActivitiesCount,
         ];
 
-        $attendanceTrend = [
-            ['heightClass' => 'h-20'],
-            ['heightClass' => 'h-24'],
-            ['heightClass' => 'h-16'],
-            ['heightClass' => 'h-28'],
-            ['heightClass' => 'h-32'],
-            ['heightClass' => 'h-24'],
-            ['heightClass' => 'h-36'],
-        ];
+        $attendanceTrend = collect(range(6, 0))
+            ->map(function (int $dayOffset) {
+                $day = Carbon::now()->subDays($dayOffset);
+                $count = Attendance::query()->whereDate('check_in_time', $day->toDateString())->count();
 
-        $recentCheckIns = [
-            [
-                'name' => 'Alex Rivers',
-                'time' => '08:57 AM',
-                'department' => 'Strategic Architecture',
-                'gps_status' => 'valid',
-            ],
-            [
-                'name' => 'Sarah Jenkins',
-                'time' => '09:08 AM',
-                'department' => 'Financial Analytics',
-                'gps_status' => 'invalid',
-            ],
-            [
-                'name' => 'Daniel Moore',
-                'time' => '09:12 AM',
-                'department' => 'Operations',
-                'gps_status' => 'valid',
-            ],
-        ];
+                return [
+                    'date_label' => $day->format('d M'),
+                    'count' => $count,
+                ];
+            })
+            ->values()
+            ->all();
+
+        $recentCheckIns = Attendance::query()
+            ->with('user')
+            ->latest('check_in_time')
+            ->limit(6)
+            ->get()
+            ->map(function (Attendance $attendance) {
+                return [
+                    'name' => $attendance->user?->name ?? 'Peserta',
+                    'time' => optional($attendance->check_in_time)->format('d M Y H:i') ?? '-',
+                    'department' => $attendance->user?->department ?? '-',
+                    'gps_status' => $attendance->status,
+                ];
+            })
+            ->values()
+            ->all();
 
         return view('pages.admin.dashboard', compact('summary', 'attendanceTrend', 'recentCheckIns'));
     }
@@ -148,9 +181,26 @@ class AdminPageController extends Controller
         return view('pages.admin.intern-detail', compact('intern'));
     }
 
-    public function attendance(): View
+    public function attendance(Request $request): View
     {
-        return view('pages.admin.attendance');
+        $filterDate = (string) $request->query('date', '');
+        $filterUserId = (string) $request->query('user_id', '');
+        $filterStatus = (string) $request->query('status', '');
+
+        $attendanceQuery = Attendance::query()
+            ->with(['user:id,name', 'location:id,name'])
+            ->when($filterDate !== '', fn ($query) => $query->whereDate('check_in_time', $filterDate))
+            ->when($filterUserId !== '', fn ($query) => $query->where('user_id', (int) $filterUserId))
+            ->when(in_array($filterStatus, ['valid', 'invalid'], true), fn ($query) => $query->where('status', $filterStatus))
+            ->latest('check_in_time');
+
+        $attendances = $attendanceQuery->paginate(12)->withQueryString();
+        $internOptions = User::query()
+            ->whereIn('role', [User::ROLE_INTERN, User::ROLE_USER])
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        return view('pages.admin.attendance', compact('attendances', 'internOptions', 'filterDate', 'filterUserId', 'filterStatus'));
     }
 
     public function locations(): View
@@ -183,8 +233,32 @@ class AdminPageController extends Controller
         return redirect()->route('internhub.admin.locations')->with('status', 'Lokasi magang berhasil dihapus.');
     }
 
-    public function reports(): View
+    public function reports(Request $request): View
     {
-        return view('pages.admin.reports');
+        $startDate = (string) $request->query('start_date', now()->subDays(6)->toDateString());
+        $endDate = (string) $request->query('end_date', now()->toDateString());
+
+        $dailyReports = Attendance::query()
+            ->selectRaw('DATE(check_in_time) as report_date')
+            ->selectRaw('COUNT(*) as total_attendance')
+            ->selectRaw("SUM(CASE WHEN status = 'valid' THEN 1 ELSE 0 END) as valid_attendance")
+            ->selectRaw("SUM(CASE WHEN status = 'invalid' THEN 1 ELSE 0 END) as invalid_attendance")
+            ->whereDate('check_in_time', '>=', $startDate)
+            ->whereDate('check_in_time', '<=', $endDate)
+            ->groupBy('report_date')
+            ->orderByDesc('report_date')
+            ->get();
+
+        $summary = [
+            'total_attendance' => (int) $dailyReports->sum('total_attendance'),
+            'valid_attendance' => (int) $dailyReports->sum('valid_attendance'),
+            'invalid_attendance' => (int) $dailyReports->sum('invalid_attendance'),
+        ];
+
+        $attendanceRate = $summary['total_attendance'] > 0
+            ? round(($summary['valid_attendance'] / $summary['total_attendance']) * 100, 1)
+            : 0;
+
+        return view('pages.admin.reports', compact('dailyReports', 'summary', 'attendanceRate', 'startDate', 'endDate'));
     }
 }

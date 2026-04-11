@@ -79,6 +79,11 @@
         <div class="meta">Peserta: {{ $user->name }}</div>
         <div class="meta">Email: {{ $user->email }}</div>
         <div class="meta">Filter Tanggal: {{ $filterDate ? \Illuminate\Support\Carbon::parse($filterDate)->format('d M Y') : 'Semua Tanggal' }}</div>
+        <div class="meta">
+            Rentang: {{ $startDate ? \Illuminate\Support\Carbon::parse($startDate)->format('d M Y') : 'Semua Tanggal' }}
+            -
+            {{ $endDate ? \Illuminate\Support\Carbon::parse($endDate)->format('d M Y') : 'Semua Tanggal' }}
+        </div>
         <div class="meta">Dicetak Pada: {{ $generatedAt->format('d M Y H:i') }}</div>
     </div>
 
@@ -90,6 +95,10 @@
         <tr>
             <td class="label">Kehadiran Valid</td>
             <td>{{ $summary['valid_attendance'] }}</td>
+        </tr>
+        <tr>
+            <td class="label">Kehadiran Tidak Valid</td>
+            <td>{{ $summary['invalid_attendance'] }}</td>
         </tr>
     </table>
 

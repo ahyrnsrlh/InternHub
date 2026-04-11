@@ -67,6 +67,15 @@
                         <label class="mb-1 block text-sm font-medium text-gray-700">Penempatan</label>
                         <input name="placement" type="text" value="{{ old('placement', $user->placement) }}" class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
                     </div>
+                    <div class="sm:col-span-2 rounded-xl border border-gray-200 bg-gray-50 p-4">
+                        <label class="inline-flex items-start gap-3">
+                            <input type="checkbox" name="location_tracking_enabled" value="1" class="mt-0.5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" @checked(old('location_tracking_enabled', $user->location_tracking_enabled))>
+                            <span>
+                                <span class="block text-sm font-semibold text-gray-800">Aktifkan pelacakan lokasi periodik</span>
+                                <span class="mt-1 block text-xs text-gray-500">Hanya aktif pada jam kerja untuk keperluan monitoring magang. Anda dapat mematikan kapan saja.</span>
+                            </span>
+                        </label>
+                    </div>
                     <div class="sm:col-span-2">
                         <x-button type="submit">Simpan Perubahan Profil</x-button>
                     </div>
@@ -182,6 +191,11 @@
             },
 
             async loadModels() {
+                if (window.__internhubFaceModelsLoaded) {
+                    this.modelsLoaded = true;
+                    return true;
+                }
+
                 if (this.modelsLoaded) {
                     return true;
                 }
@@ -222,6 +236,7 @@
                     }
 
                     this.modelsLoaded = true;
+                    window.__internhubFaceModelsLoaded = true;
                     this.errorMessage = '';
                     return true;
                 } catch (error) {

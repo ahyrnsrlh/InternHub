@@ -47,6 +47,19 @@
     </x-card>
 
     <x-card class="lg:col-span-2" title="Linimasa Aktivitas" subtitle="Riwayat aktivitas magang terbaru Anda.">
+        <form method="GET" action="{{ route('user.logbook.index') }}" class="mb-4 flex flex-wrap items-end gap-3">
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700">Dari Tanggal</label>
+                <x-input type="date" name="start_date" :value="request('start_date')" />
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700">Sampai Tanggal</label>
+                <x-input type="date" name="end_date" :value="request('end_date')" />
+            </div>
+            <x-button variant="secondary" type="submit">Filter</x-button>
+            <a href="{{ route('user.logbook.export.pdf', ['start_date' => request('start_date'), 'end_date' => request('end_date')]) }}" class="inline-flex items-center rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800">Unduh PDF</a>
+        </form>
+
         @if ($logs->count())
             <ol class="relative ml-3 space-y-6 border-l border-gray-200 pl-6">
                 @foreach ($logs as $log)

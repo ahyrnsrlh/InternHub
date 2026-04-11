@@ -24,6 +24,7 @@ class UserProfileRequest extends FormRequest
             'department' => ['nullable', 'string', 'max:255'],
             'placement' => ['nullable', 'string', 'max:255'],
             'status' => ['nullable', 'in:active,inactive,on_leave'],
+            'location_tracking_enabled' => ['nullable', 'boolean'],
         ];
     }
 }

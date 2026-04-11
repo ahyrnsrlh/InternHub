@@ -17,8 +17,26 @@ class AttendanceCheckInRequest extends FormRequest
             'location_id' => ['required', 'integer', 'exists:locations,id'],
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],
-            'face_descriptor' => ['required', 'string'],
-            'check_in_time' => ['nullable', 'date'],
+            'face_descriptor' => [
+                'required',
+                'string',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    $decoded = json_decode((string) $value, true);
+
+                    if (! is_array($decoded) || count($decoded) !== 128) {
+                        $fail('Data validasi wajah tidak valid.');
+                        return;
+                    }
+
+                    foreach ($decoded as $item) {
+                        if (! is_numeric($item)) {
+                            $fail('Data validasi wajah harus berupa angka.');
+                            return;
+                        }
+                    }
+                },
+            ],
+            'check_in_time' => ['nullable', 'date', 'before_or_equal:now'],
             'allowed_radius_meters' => ['nullable', 'numeric', 'min:1', 'max:1000'],
         ];
     }

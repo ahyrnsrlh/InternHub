@@ -4,16 +4,19 @@ namespace App\Http\Controllers\User;
 
 use App\Models\Attendance;
 use App\Models\Location;
+use App\Models\User;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\AttendanceRequest;
 use App\Http\Requests\User\AttendanceCheckInRequest;
 use App\Http\Requests\User\AttendanceCheckOutRequest;
+use App\Notifications\AttendanceStatusNotification;
 use App\Services\FaceService;
 use App\Services\LocationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 use Illuminate\View\View;
 
@@ -34,7 +37,7 @@ class AttendanceController extends Controller
 
         $locations = Location::query()
             ->orderBy('name')
-            ->get(['id', 'name', 'address', 'latitude', 'longitude']);
+            ->get(['id', 'name', 'address', 'latitude', 'longitude', 'radius_meters', 'status']);
 
         $activeAttendance = Attendance::query()
             ->where('user_id', Auth::id())
@@ -76,6 +79,12 @@ class AttendanceController extends Controller
 
         $location = Location::query()->findOrFail($validated['location_id']);
 
+        if (($location->status ?? 'active') !== 'active') {
+            return redirect()->route('user.attendance.index')->withErrors([
+                'attendance' => 'Lokasi presensi tidak aktif dan tidak dapat digunakan.',
+            ]);
+        }
+
         $distance = $this->locationService->calculateDistance(
             (float) $validated['latitude'],
             (float) $validated['longitude'],
@@ -83,7 +92,8 @@ class AttendanceController extends Controller
             (float) $location->longitude,
         );
 
-        $status = $distance <= (float) ($validated['allowed_radius_meters'] ?? 100) ? 'valid' : 'invalid';
+        $authoritativeRadius = (float) ($location->radius_meters ?? 100);
+        $status = $distance <= $authoritativeRadius ? 'valid' : 'invalid';
 
         $attendanceRecord->update([
             'location_id' => $validated['location_id'],
@@ -123,6 +133,15 @@ class AttendanceController extends Controller
                 'check_out_time' => $validated['check_out_time'] ?? now(),
             ]);
 
+            $requestUser = $request->user();
+            if ($requestUser instanceof User) {
+                $requestUser->notify(new AttendanceStatusNotification(
+                    'Presensi Pulang',
+                    'Presensi pulang berhasil dicatat pada '.optional($activeAttendance->check_out_time)->format('d M Y H:i').'.',
+                    ['attendance_id' => $activeAttendance->id]
+                ));
+            }
+
             return $this->respondSuccess('Presensi pulang berhasil dicatat.', $request->expectsJson(), [
                 'attendance_id' => $activeAttendance->id,
                 'check_out_time' => $activeAttendance->check_out_time,
@@ -151,6 +170,8 @@ class AttendanceController extends Controller
         try {
             $user = Auth::user();
             $userId = (int) $user?->id;
+            $latitude = (float) $validated['latitude'];
+            $longitude = (float) $validated['longitude'];
 
             $activeAttendanceExists = Attendance::query()
                 ->where('user_id', $userId)
@@ -165,14 +186,34 @@ class AttendanceController extends Controller
                 return $this->respondError('Validasi wajah wajib dilakukan sebelum presensi masuk.', $expectsJson, 422);
             }
 
+            if (abs($latitude) < 0.000001 && abs($longitude) < 0.000001) {
+                return $this->respondError('Koordinat GPS tidak valid. Silakan aktifkan layanan lokasi perangkat.', $expectsJson, 422);
+            }
+
             $location = Location::query()->findOrFail($validated['location_id']);
 
+            if (($location->status ?? 'active') !== 'active') {
+                return $this->respondError('Lokasi presensi tidak aktif dan tidak dapat digunakan.', $expectsJson, 422);
+            }
+
+            $authoritativeRadius = (float) ($location->radius_meters ?? 100);
+            if (isset($validated['allowed_radius_meters']) && abs(((float) $validated['allowed_radius_meters']) - $authoritativeRadius) > 0.0001) {
+                Log::warning('Attendance radius tampering attempt detected', [
+                    'user_id' => $userId,
+                    'location_id' => $location->id,
+                    'client_radius' => (float) $validated['allowed_radius_meters'],
+                    'db_radius' => $authoritativeRadius,
+                ]);
+
+                return $this->respondError('Parameter radius tidak valid.', $expectsJson, 422);
+            }
+
             $gpsValidation = $this->locationService->validateRadius(
-                (float) $validated['latitude'],
-                (float) $validated['longitude'],
+                $latitude,
+                $longitude,
                 (float) $location->latitude,
                 (float) $location->longitude,
-                (float) ($validated['allowed_radius_meters'] ?? 100),
+                $authoritativeRadius,
             );
 
             $faceValidation = $this->faceService->compareFaceDescriptor(
@@ -181,6 +222,18 @@ class AttendanceController extends Controller
             );
 
             $status = ($gpsValidation['is_valid'] && $faceValidation['is_match']) ? 'valid' : 'invalid';
+
+            Log::info('Attendance GPS validation', [
+                'user_id' => $userId,
+                'location_id' => $location->id,
+                'user_latitude' => $latitude,
+                'user_longitude' => $longitude,
+                'distance_meters' => round((float) $gpsValidation['distance_meters'], 3),
+                'allowed_radius_meters' => $authoritativeRadius,
+                'gps_valid' => (bool) $gpsValidation['is_valid'],
+                'face_valid' => (bool) $faceValidation['is_match'],
+                'status' => $status,
+            ]);
 
             $attendance = DB::transaction(function () use ($validated, $userId, $status) {
                 return Attendance::query()->create([
@@ -192,6 +245,20 @@ class AttendanceController extends Controller
                     'status' => $status,
                 ]);
             });
+
+            if ($user instanceof User) {
+                $user->notify(new AttendanceStatusNotification(
+                    'Presensi Masuk',
+                    $status === 'valid'
+                        ? 'Presensi masuk berhasil dan tervalidasi.'
+                        : 'Presensi masuk tercatat tetapi validasi GPS atau wajah tidak memenuhi syarat.',
+                    [
+                        'attendance_id' => $attendance->id,
+                        'status' => $status,
+                        'distance_meters' => round((float) $gpsValidation['distance_meters'], 2),
+                    ]
+                ));
+            }
 
             return $this->respondSuccess(
                 $status === 'valid'

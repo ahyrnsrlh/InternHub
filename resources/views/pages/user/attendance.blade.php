@@ -21,6 +21,7 @@
             'address' => $location->address,
             'latitude' => (float) $location->latitude,
             'longitude' => (float) $location->longitude,
+            'radius_meters' => (int) ($location->radius_meters ?? 100),
         ];
     })->values();
 @endphp
@@ -107,7 +108,7 @@
                     </div>
 
                     <div class="flex flex-wrap gap-2">
-                        <x-button type="button" variant="secondary" @click="startCamera" x-bind:disabled="cameraLoading">
+                        <x-button type="button" variant="secondary" @click="startCamera" x-bind:disabled="cameraLoading || faceModelLoading">
                             <span x-show="!cameraLoading">Aktifkan Kamera</span>
                             <span x-show="cameraLoading">Memuat Kamera...</span>
                         </x-button>
@@ -250,13 +251,11 @@ function attendanceValidation() {
             this.locations = this.readJson('#attendance-locations');
             this.referenceDescriptor = this.readJson('#attendance-face-reference');
 
+            const selectedLocation = this.getSelectedLocation();
+            this.allowedRadius = selectedLocation?.radius_meters || 100;
+
             this.initMap();
             this.startGpsWatcher();
-            this.loadFaceModels();
-
-            this.$nextTick(() => {
-                this.startCamera();
-            });
 
             window.addEventListener('beforeunload', () => {
                 this.stopCamera();
@@ -319,6 +318,8 @@ function attendanceValidation() {
         },
 
         onLocationChanged() {
+            const selectedLocation = this.getSelectedLocation();
+            this.allowedRadius = selectedLocation?.radius_meters || 100;
             this.refreshMapOverlay();
         },
 
@@ -399,6 +400,11 @@ function attendanceValidation() {
         },
 
         async loadFaceModels() {
+            if (window.__internhubFaceModelsLoaded) {
+                this.faceModelLoading = false;
+                return;
+            }
+
             if (!window.faceapi) {
                 this.faceError = 'Pustaka face-api.js gagal dimuat.';
                 return;
@@ -431,10 +437,21 @@ function attendanceValidation() {
 
             if (!loaded) {
                 this.faceError = 'Model wajah tidak dapat dimuat. Silakan hubungi administrator.';
+                return;
             }
+
+            window.__internhubFaceModelsLoaded = true;
         },
 
         async startCamera() {
+            if (!window.__internhubFaceModelsLoaded) {
+                await this.loadFaceModels();
+            }
+
+            if (!window.__internhubFaceModelsLoaded) {
+                return;
+            }
+
             this.cameraLoading = true;
             this.faceError = null;
 
@@ -549,7 +566,6 @@ function attendanceValidation() {
             if (!this.canCheckIn()) {
                 window.dispatchEvent(new CustomEvent('notify', {
                     detail: {
-                        message: 'Check-in blocked. Ensure GPS is inside radius and face is matched.',
                         message: 'Presensi masuk ditolak. Pastikan GPS berada dalam radius dan wajah berhasil dicocokkan.',
                         type: 'error',
                     },

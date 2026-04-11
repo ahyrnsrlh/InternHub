@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Models\Attendance;
+use App\Models\DailyLog;
 use App\Models\User;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\UserDashboardRequest;
@@ -13,8 +15,52 @@ class UserController extends Controller
 {
     public function index(): View
     {
+        $userId = (int) Auth::id();
+
+        $totalAttendance = Attendance::query()
+            ->where('user_id', $userId)
+            ->count();
+
+        $validAttendance = Attendance::query()
+            ->where('user_id', $userId)
+            ->where('status', 'valid')
+            ->count();
+
+        $totalActivities = DailyLog::query()
+            ->where('user_id', $userId)
+            ->count();
+
+        $activitiesThisWeek = DailyLog::query()
+            ->where('user_id', $userId)
+            ->whereDate('log_date', '>=', now()->subDays(7)->toDateString())
+            ->count();
+
+        $recentAttendances = Attendance::query()
+            ->where('user_id', $userId)
+            ->latest('check_in_time')
+            ->limit(5)
+            ->get();
+
+        $checkedInToday = Attendance::query()
+            ->where('user_id', $userId)
+            ->whereDate('check_in_time', now()->toDateString())
+            ->exists();
+
+        $attendanceRate = $totalAttendance > 0
+            ? round(($validAttendance / $totalAttendance) * 100, 1)
+            : 0;
+
         return view('pages.user.dashboard', [
             'user' => Auth::user(),
+            'summary' => [
+                'total_attendance' => $totalAttendance,
+                'valid_attendance' => $validAttendance,
+                'attendance_rate' => $attendanceRate,
+                'total_activities' => $totalActivities,
+                'activities_this_week' => $activitiesThisWeek,
+                'checked_in_today' => $checkedInToday,
+            ],
+            'recentAttendances' => $recentAttendances,
         ]);
     }
 

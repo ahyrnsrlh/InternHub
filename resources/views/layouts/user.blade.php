@@ -26,7 +26,7 @@
 
     @stack('styles')
 </head>
-<body class="bg-gray-50 text-gray-800 antialiased" x-data="{ sidebarOpen: false, profileOpen: false }">
+<body class="bg-gray-50 text-gray-800 antialiased" x-data="{ sidebarOpen: false, profileOpen: false, notifOpen: false }">
     <div class="min-h-screen">
         <div
             x-show="sidebarOpen"
@@ -106,15 +106,49 @@
                     @php
                         $authUser = auth()->user();
                         $headerPhotoUrl = null;
+                        $unreadCount = $authUser?->unreadNotifications()->count() ?? 0;
+                        $latestNotifications = $authUser?->notifications()->latest()->limit(5)->get() ?? collect();
                         if ($authUser?->profile_photo && \Illuminate\Support\Facades\Storage::disk('public')->exists($authUser->profile_photo)) {
                             $headerPhotoUrl = \Illuminate\Support\Facades\Storage::url($authUser->profile_photo);
                         }
                     @endphp
 
                     <div class="relative flex items-center gap-3">
-                        <button class="rounded-full border border-gray-200 bg-white p-2 text-gray-500 hover:border-indigo-200 hover:text-indigo-600">
+                        <button class="relative rounded-full border border-gray-200 bg-white p-2 text-gray-500 hover:border-indigo-200 hover:text-indigo-600" @click="notifOpen = !notifOpen" aria-label="Buka notifikasi">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0a3 3 0 11-6 0" /></svg>
+                            @if ($unreadCount > 0)
+                                <span class="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">{{ $unreadCount > 9 ? '9+' : $unreadCount }}</span>
+                            @endif
                         </button>
+
+                        <div x-show="notifOpen" x-transition class="absolute right-12 top-12 z-30 w-80 rounded-xl border border-gray-200 bg-white p-2 shadow-sm" @click.outside="notifOpen = false" style="display: none;">
+                            <div class="flex items-center justify-between px-2 py-2">
+                                <p class="text-sm font-semibold text-gray-900">Notifikasi</p>
+                                @if ($unreadCount > 0)
+                                    <form method="POST" action="{{ route('user.notifications.read-all') }}">
+                                        @csrf
+                                        <button type="submit" class="text-xs font-medium text-indigo-600 hover:text-indigo-700">Tandai Dibaca</button>
+                                    </form>
+                                @endif
+                            </div>
+
+                            <div class="max-h-80 space-y-1 overflow-y-auto px-1 pb-1">
+                                @forelse ($latestNotifications as $notification)
+                                    @php
+                                        $payload = (array) $notification->data;
+                                        $isUnread = is_null($notification->read_at);
+                                    @endphp
+                                    <div class="rounded-lg border px-3 py-2 {{ $isUnread ? 'border-indigo-100 bg-indigo-50' : 'border-gray-200 bg-white' }}">
+                                        <p class="text-xs font-semibold text-gray-900">{{ $payload['title'] ?? 'Notifikasi Sistem' }}</p>
+                                        <p class="mt-1 text-xs text-gray-600">{{ $payload['message'] ?? '-' }}</p>
+                                        <p class="mt-1 text-[11px] text-gray-400">{{ $notification->created_at?->diffForHumans() }}</p>
+                                    </div>
+                                @empty
+                                    <p class="rounded-lg border border-dashed border-gray-200 px-3 py-6 text-center text-xs text-gray-500">Belum ada notifikasi.</p>
+                                @endforelse
+                            </div>
+                        </div>
+
                         <button class="h-9 w-9 overflow-hidden rounded-full border border-gray-200 bg-white" @click="profileOpen = !profileOpen" aria-label="Buka menu profil">
                             @if ($headerPhotoUrl)
                                 <img src="{{ $headerPhotoUrl }}" alt="Foto Profil" class="h-full w-full object-cover">
@@ -149,6 +183,14 @@
         data-error="{{ session('error') ?? ($errors->any() ? $errors->first() : '') }}"
     ></div>
 
+    <div
+        id="tracking-config"
+        hidden
+        data-enabled="{{ auth()->user()?->location_tracking_enabled ? '1' : '0' }}"
+        data-endpoint="{{ route('user.location-tracking.store') }}"
+        data-interval="{{ (int) config('internhub.tracking.interval_seconds', 120) }}"
+    ></div>
+
     <script>
         window.addEventListener('DOMContentLoaded', () => {
             const flash = document.getElementById('flash-data');
@@ -170,6 +212,51 @@
                     detail: { message: error, type: 'error' }
                 }));
             }
+
+            const trackingConfig = document.getElementById('tracking-config');
+            if (!trackingConfig || trackingConfig.dataset.enabled !== '1' || !navigator.geolocation) {
+                return;
+            }
+
+            const endpoint = trackingConfig.dataset.endpoint;
+            const intervalSeconds = Number(trackingConfig.dataset.interval || '120');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            let lastSentAt = 0;
+
+            const sendLocation = (latitude, longitude) => {
+                const now = Date.now();
+                if (now - lastSentAt < intervalSeconds * 1000) {
+                    return;
+                }
+
+                lastSentAt = now;
+                fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        latitude,
+                        longitude,
+                        logged_at: new Date().toISOString(),
+                    }),
+                    credentials: 'same-origin',
+                }).catch(() => {
+                    // Silently ignore network issues for background tracking.
+                });
+            };
+
+            navigator.geolocation.watchPosition(
+                (position) => sendLocation(position.coords.latitude, position.coords.longitude),
+                () => {},
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 15000,
+                }
+            );
         });
     </script>
 

@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'role', 'title', 'department', 'placement', 'status', 'mentor_id', 'profile_photo', 'face_descriptor', 'face_registered'])]
+#[Fillable(['name', 'email', 'password', 'role', 'title', 'department', 'placement', 'status', 'mentor_id', 'profile_photo', 'face_descriptor', 'face_registered', 'location_tracking_enabled'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -35,6 +35,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'face_descriptor' => 'array',
             'face_registered' => 'boolean',
+            'location_tracking_enabled' => 'boolean',
         ];
     }
 
@@ -51,6 +52,11 @@ class User extends Authenticatable
     public function dailyLogs(): HasMany
     {
         return $this->hasMany(DailyLog::class);
+    }
+
+    public function locationLogs(): HasMany
+    {
+        return $this->hasMany(LocationLog::class);
     }
 
     public function logbooks(): HasMany
