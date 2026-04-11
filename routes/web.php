@@ -1,7 +1,15 @@
 <?php
 
 use App\Models\User;
+use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Admin\AdminPageController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\User\ReportController;
+use App\Http\Controllers\User\ProfileController as UserProfileController;
+use App\Http\Controllers\User\LogbookController;
+use App\Http\Controllers\User\LocationController;
+use App\Http\Controllers\User\AttendanceController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -15,6 +23,7 @@ Route::get('/dashboard', function () {
 Route::prefix('internhub')->name('internhub.')->middleware('guest')->group(function () {
     Route::view('/login', 'pages.user.auth.login')->name('login');
     Route::view('/register', 'pages.user.auth.register')->name('register');
+    Route::get('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login');
 });
 
 Route::prefix('internhub')->name('internhub.')->middleware(['auth', 'verified'])->group(function () {
@@ -33,7 +42,12 @@ Route::prefix('internhub')->name('internhub.')->middleware(['auth', 'verified'])
     })->name('dashboard');
 
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
-        Route::view('/dashboard', 'pages.admin.dashboard')->name('dashboard');
+        Route::get('/dashboard', [AdminPageController::class, 'dashboard'])->name('dashboard');
+        Route::get('/interns', [AdminPageController::class, 'interns'])->name('interns');
+        Route::get('/interns/{intern}', [AdminPageController::class, 'internDetail'])->name('intern-detail');
+        Route::get('/attendance', [AdminPageController::class, 'attendance'])->name('attendance');
+        Route::get('/locations', [AdminPageController::class, 'locations'])->name('locations');
+        Route::get('/reports', [AdminPageController::class, 'reports'])->name('reports');
     });
 
     Route::name('intern.')->middleware('role:intern,user')->group(function () {
@@ -66,6 +80,20 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
+    Route::resources([
+        'dashboard' => UserController::class,
+        'attendance' => AttendanceController::class,
+        'locations' => LocationController::class,
+        'logbook' => LogbookController::class,
+        'reports' => ReportController::class,
+        'profile' => UserProfileController::class,
+    ], ['except' => ['show']]);
+
+    Route::get('/map', [LocationController::class, 'map'])->name('map.index');
+    Route::get('/recap', [ReportController::class, 'recap'])->name('recap.index');
 });
 
 require __DIR__.'/auth.php';
