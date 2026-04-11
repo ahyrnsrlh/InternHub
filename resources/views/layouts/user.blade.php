@@ -52,14 +52,14 @@
             <nav class="space-y-1 p-4">
                 @php
                     $menu = [
-                        ['label' => 'Dashboard', 'route' => 'internhub.dashboard', 'icon' => 'home'],
-                        ['label' => 'Attendance', 'route' => 'internhub.intern.attendance', 'icon' => 'clock'],
-                        ['label' => 'Locations', 'route' => 'internhub.intern.locations', 'icon' => 'pin'],
-                        ['label' => 'Map', 'route' => 'internhub.intern.map', 'icon' => 'map'],
-                        ['label' => 'Logbook', 'route' => 'internhub.intern.logbook', 'icon' => 'book'],
-                        ['label' => 'Reports', 'route' => 'internhub.intern.reports', 'icon' => 'table'],
-                        ['label' => 'Recap', 'route' => 'internhub.intern.recap', 'icon' => 'chart'],
-                        ['label' => 'Profile', 'route' => 'internhub.intern.profile', 'icon' => 'user'],
+                        ['label' => 'Dashboard', 'route' => 'user.dashboard.index', 'icon' => 'home'],
+                        ['label' => 'Attendance', 'route' => 'user.attendance.index', 'icon' => 'clock'],
+                        ['label' => 'Locations', 'route' => 'user.locations.index', 'icon' => 'pin'],
+                        ['label' => 'Map', 'route' => 'user.map.index', 'icon' => 'map'],
+                        ['label' => 'Logbook', 'route' => 'user.logbook.index', 'icon' => 'book'],
+                        ['label' => 'Reports', 'route' => 'user.reports.index', 'icon' => 'table'],
+                        ['label' => 'Recap', 'route' => 'user.recap.index', 'icon' => 'chart'],
+                        ['label' => 'Profile', 'route' => 'user.profile.index', 'icon' => 'user'],
                     ];
                 @endphp
 

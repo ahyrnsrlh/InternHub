@@ -29,7 +29,17 @@ class AttendanceController extends Controller
             ->latest('check_in_time')
             ->paginate(10);
 
-        return view('pages.user.attendance', compact('attendances'));
+        $locations = Location::query()
+            ->orderBy('name')
+            ->get(['id', 'name', 'address', 'latitude', 'longitude']);
+
+        $activeAttendance = Attendance::query()
+            ->where('user_id', Auth::id())
+            ->whereNull('check_out_time')
+            ->latest('check_in_time')
+            ->first();
+
+        return view('pages.user.attendance', compact('attendances', 'locations', 'activeAttendance'));
     }
 
     public function create(): View

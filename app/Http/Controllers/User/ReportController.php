@@ -13,12 +13,15 @@ class ReportController extends Controller
 {
     public function index(): View
     {
+        $filterDate = request()->query('date');
+
         $reports = DailyLog::query()
             ->where('user_id', Auth::id())
+            ->when($filterDate, fn ($query) => $query->whereDate('log_date', $filterDate))
             ->latest('log_date')
             ->paginate(10);
 
-        return view('pages.user.reports', compact('reports'));
+        return view('pages.user.reports', compact('reports', 'filterDate'));
     }
 
     public function create(): View
