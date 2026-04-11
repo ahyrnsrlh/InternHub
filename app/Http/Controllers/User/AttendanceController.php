@@ -8,7 +8,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\User\AttendanceRequest;
 use App\Http\Requests\User\AttendanceCheckInRequest;
 use App\Http\Requests\User\AttendanceCheckOutRequest;
-use App\Services\GpsValidationService;
+use App\Services\FaceService;
+use App\Services\LocationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -18,8 +19,10 @@ use Illuminate\View\View;
 
 class AttendanceController extends Controller
 {
-    public function __construct(private readonly GpsValidationService $gpsValidationService)
-    {
+    public function __construct(
+        private readonly LocationService $locationService,
+        private readonly FaceService $faceService,
+    ) {
     }
 
     public function index(): View
@@ -73,17 +76,14 @@ class AttendanceController extends Controller
 
         $location = Location::query()->findOrFail($validated['location_id']);
 
-        $distance = $this->gpsValidationService->calculateDistance(
+        $distance = $this->locationService->calculateDistance(
             (float) $validated['latitude'],
             (float) $validated['longitude'],
             (float) $location->latitude,
             (float) $location->longitude,
         );
 
-        $status = $this->gpsValidationService->resolveStatus(
-            $distance,
-            (float) ($validated['allowed_radius_meters'] ?? 10),
-        );
+        $status = $distance <= (float) ($validated['allowed_radius_meters'] ?? 100) ? 'valid' : 'invalid';
 
         $attendanceRecord->update([
             'location_id' => $validated['location_id'],
@@ -149,7 +149,8 @@ class AttendanceController extends Controller
     private function checkInFromPayload(array $validated, bool $expectsJson = false): RedirectResponse|JsonResponse
     {
         try {
-            $userId = (int) Auth::id();
+            $user = Auth::user();
+            $userId = (int) $user?->id;
 
             $activeAttendanceExists = Attendance::query()
                 ->where('user_id', $userId)
@@ -160,17 +161,26 @@ class AttendanceController extends Controller
                 return $this->respondError('You already have an active check-in. Please check out first.', $expectsJson, 422);
             }
 
+            if (empty($validated['face_descriptor'])) {
+                return $this->respondError('Face validation is required before check-in.', $expectsJson, 422);
+            }
+
             $location = Location::query()->findOrFail($validated['location_id']);
 
-            $distance = $this->gpsValidationService->calculateDistance(
+            $gpsValidation = $this->locationService->validateRadius(
                 (float) $validated['latitude'],
                 (float) $validated['longitude'],
                 (float) $location->latitude,
                 (float) $location->longitude,
+                (float) ($validated['allowed_radius_meters'] ?? 100),
             );
 
-            $radius = (float) ($validated['allowed_radius_meters'] ?? 10);
-            $status = $this->gpsValidationService->resolveStatus($distance, $radius);
+            $faceValidation = $this->faceService->compareFaceDescriptor(
+                (string) $validated['face_descriptor'],
+                $user?->face_descriptor,
+            );
+
+            $status = ($gpsValidation['is_valid'] && $faceValidation['is_match']) ? 'valid' : 'invalid';
 
             $attendance = DB::transaction(function () use ($validated, $userId, $status) {
                 return Attendance::query()->create([
@@ -185,14 +195,19 @@ class AttendanceController extends Controller
 
             return $this->respondSuccess(
                 $status === 'valid'
-                    ? 'Check-in recorded. Location verified.'
-                    : 'Check-in recorded, but your location is outside the allowed radius.',
+                    ? 'Check-in recorded. Location and face verification passed.'
+                    : 'Check-in recorded with invalid status. GPS or face verification failed.',
                 $expectsJson,
                 [
                     'attendance_id' => $attendance->id,
                     'status' => $attendance->status,
-                    'distance_meters' => round($distance, 2),
-                    'allowed_radius_meters' => $radius,
+                    'gps_valid' => $gpsValidation['is_valid'],
+                    'distance_meters' => round($gpsValidation['distance_meters'], 2),
+                    'allowed_radius_meters' => $gpsValidation['allowed_radius_meters'],
+                    'face_match' => $faceValidation['is_match'],
+                    'face_distance' => $faceValidation['distance'],
+                    'face_threshold' => $faceValidation['threshold'],
+                    'face_message' => $faceValidation['message'],
                 ]
             );
         } catch (Throwable $exception) {

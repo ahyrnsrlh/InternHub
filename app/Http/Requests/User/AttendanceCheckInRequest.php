@@ -17,6 +17,7 @@ class AttendanceCheckInRequest extends FormRequest
             'location_id' => ['required', 'integer', 'exists:locations,id'],
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],
+            'face_descriptor' => ['required', 'string'],
             'check_in_time' => ['nullable', 'date'],
             'allowed_radius_meters' => ['nullable', 'numeric', 'min:1', 'max:1000'],
         ];
@@ -29,6 +30,7 @@ class AttendanceCheckInRequest extends FormRequest
             'location_id.exists' => 'Selected location is not valid.',
             'latitude.required' => 'Latitude is required for GPS validation.',
             'longitude.required' => 'Longitude is required for GPS validation.',
+            'face_descriptor.required' => 'Face validation data is required before check-in.',
         ];
     }
 }
