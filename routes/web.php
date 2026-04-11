@@ -12,16 +12,14 @@ use App\Http\Controllers\User\LocationController;
 use App\Http\Controllers\User\AttendanceController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::redirect('/', '/login');
+Route::redirect('/internhub/login', '/login');
 
 Route::get('/dashboard', function () {
     return redirect()->route('internhub.dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::prefix('internhub')->name('internhub.')->middleware('guest')->group(function () {
-    Route::view('/login', 'pages.user.auth.login')->name('login');
     Route::view('/register', 'auth.register')->name('register');
     Route::get('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login');
 });

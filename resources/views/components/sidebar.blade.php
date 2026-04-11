@@ -34,7 +34,7 @@
     </nav>
 
     <div class="mt-6 border-t border-line pt-4 space-y-2">
-        <a href="{{ route('internhub.login') }}" class="flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm text-content-muted hover:text-content hover:bg-primary-soft/80">
+        <a href="{{ route('login') }}" class="flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm text-content-muted hover:text-content hover:bg-primary-soft/80">
             <span class="material-symbols-outlined">logout</span>
             <span>Keluar</span>
         </a>

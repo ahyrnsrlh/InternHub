@@ -34,7 +34,7 @@
                 <x-button type="button" class="w-full justify-center">Daftar</x-button>
             </form>
 
-            <p class="mt-5 text-center text-sm text-gray-500">Sudah memiliki akun? <a href="{{ route('internhub.login') }}" class="font-semibold text-indigo-600 hover:text-indigo-700">Masuk</a></p>
+            <p class="mt-5 text-center text-sm text-gray-500">Sudah memiliki akun? <a href="{{ route('login') }}" class="font-semibold text-indigo-600 hover:text-indigo-700">Masuk</a></p>
         </div>
     </div>
 </body>

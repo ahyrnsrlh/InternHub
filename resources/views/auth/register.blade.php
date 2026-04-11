@@ -44,7 +44,7 @@
                         <button type="submit" class="w-full rounded-full bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800">Daftarkan Akun</button>
                     </form>
 
-                    <p class="mt-7 text-center text-sm text-gray-500">Sudah memiliki akun? <a href="{{ route('internhub.login') }}" class="font-semibold text-emerald-700 hover:text-emerald-800">Masuk sekarang</a></p>
+                    <p class="mt-7 text-center text-sm text-gray-500">Sudah memiliki akun? <a href="{{ route('login') }}" class="font-semibold text-emerald-700 hover:text-emerald-800">Masuk sekarang</a></p>
                 </div>
             </section>
 

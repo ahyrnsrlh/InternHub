@@ -18,6 +18,12 @@
                     <h1 class="mt-6 text-4xl font-extrabold leading-tight tracking-tight text-gray-900">Selamat datang kembali!</h1>
                     <p class="mt-3 text-sm text-gray-500">Sederhanakan alur kerja magang Anda dan lanjutkan aktivitas harian dengan lebih produktif.</p>
 
+                    @if (session('success'))
+                        <div class="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+
                     <x-auth-session-status class="mt-5" :status="session('status')" />
 
                     <form method="POST" action="{{ route('login') }}" class="mt-7 space-y-4">
