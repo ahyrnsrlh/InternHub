@@ -111,17 +111,6 @@ class ReportController extends Controller
         return redirect()->route('user.reports.index')->with('status', 'Laporan berhasil dihapus.');
     }
 
-    public function recap(): View
-    {
-        $recap = [
-            'total_logs' => DailyLog::query()->where('user_id', Auth::id())->count(),
-            'approved_logs' => DailyLog::query()->where('user_id', Auth::id())->where('status', 'approved')->count(),
-            'pending_logs' => DailyLog::query()->where('user_id', Auth::id())->where('status', 'pending')->count(),
-        ];
-
-        return view('pages.user.recap', compact('recap'));
-    }
-
     private function attendanceReportQuery(?string $filterDate, ?string $startDate = null, ?string $endDate = null)
     {
         return Attendance::query()

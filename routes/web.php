@@ -66,7 +66,6 @@ Route::prefix('internhub')->name('internhub.')->middleware(['auth', 'verified'])
         Route::view('/map', 'pages.user.map')->name('map');
         Route::get('/logbook', [LogbookController::class, 'index'])->middleware('face.registered')->name('logbook');
         Route::view('/reports', 'pages.user.reports')->middleware('face.registered')->name('reports');
-        Route::view('/recap', 'pages.user.recap')->name('recap');
         Route::view('/profile', 'pages.user.profile')->name('profile');
     });
 
@@ -74,7 +73,6 @@ Route::prefix('internhub')->name('internhub.')->middleware(['auth', 'verified'])
     Route::redirect('/registration', '/internhub/locations')->name('registration');
     Route::redirect('/admin-control-center', '/internhub/admin/dashboard')->name('admin-center');
     Route::redirect('/mentor-review-panel', '/internhub/reports')->name('mentor-review');
-    Route::redirect('/monthly-logbook-summary', '/internhub/recap')->name('monthly-summary');
 
     Route::redirect('/user/dashboard', '/internhub/dashboard');
     Route::redirect('/user/attendance', '/internhub/attendance');
@@ -82,7 +80,6 @@ Route::prefix('internhub')->name('internhub.')->middleware(['auth', 'verified'])
     Route::redirect('/user/map', '/internhub/map');
     Route::redirect('/user/logbook', '/internhub/logbook');
     Route::redirect('/user/reports', '/internhub/reports');
-    Route::redirect('/user/recap', '/internhub/recap');
     Route::redirect('/user/profile', '/internhub/profile');
 });
 
@@ -122,7 +119,6 @@ Route::prefix('user')->name('user.')->middleware(['auth', 'verified', 'role:inte
         ->except(['show']);
 
     Route::get('/map', [LocationController::class, 'map'])->name('map.index');
-    Route::get('/recap', [ReportController::class, 'recap'])->name('recap.index');
 });
 
 require __DIR__.'/auth.php';

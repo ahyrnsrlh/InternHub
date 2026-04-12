@@ -56,8 +56,7 @@
                         ['label' => 'Lokasi Magang', 'route' => 'user.locations.index', 'icon' => 'pin'],
                         ['label' => 'Peta Lokasi', 'route' => 'user.map.index', 'icon' => 'map'],
                         ['label' => 'Catatan Harian', 'route' => 'user.logbook.index', 'icon' => 'book'],
-                        ['label' => 'Laporan Kehadiran', 'route' => 'user.reports.index', 'icon' => 'table'],
-                        ['label' => 'Rekap', 'route' => 'user.recap.index', 'icon' => 'chart'],
+                        ['label' => 'Rekap Kehadiran', 'route' => 'user.reports.index', 'icon' => 'table'],
                         ['label' => 'Profil', 'route' => 'user.profile.index', 'icon' => 'user'],
                     ];
                 @endphp

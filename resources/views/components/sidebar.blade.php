@@ -10,7 +10,6 @@
         ['key' => 'registration', 'label' => 'Pendaftaran Lokasi', 'icon' => 'app_registration', 'route' => 'internhub.registration'],
         ['key' => 'reviews', 'label' => 'Ulasan Pembimbing', 'icon' => 'rate_review', 'route' => 'internhub.mentor-review'],
         ['key' => 'administration', 'label' => 'Pusat Admin', 'icon' => 'admin_panel_settings', 'route' => 'internhub.admin-center'],
-        ['key' => 'summary', 'label' => 'Rekap Bulanan', 'icon' => 'summarize', 'route' => 'internhub.monthly-summary'],
     ];
 @endphp
 
