@@ -79,7 +79,7 @@
                         </button>
 
                         <div x-show="profileOpen" x-transition class="absolute right-0 z-30 mt-2 w-48 rounded-xl border border-gray-200 bg-white p-2 shadow-sm" @click.outside="profileOpen = false" style="display: none;">
-                            <a href="{{ route('profile.edit') }}" class="block rounded-lg px-3 py-2 text-sm text-gray-600 hover:bg-gray-100">Pengaturan Profil</a>
+                            <a href="{{ route('internhub.admin.profile') }}" class="block rounded-lg px-3 py-2 text-sm text-gray-600 hover:bg-gray-100">Pengaturan Profil</a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit" class="block w-full rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50">Keluar</button>

@@ -3,14 +3,26 @@
 ])
 
 @php
-    $menuItems = [
-        ['key' => 'dashboard', 'label' => 'Beranda', 'icon' => 'dashboard', 'route' => 'internhub.dashboard'],
-        ['key' => 'attendance', 'label' => 'Presensi', 'icon' => 'calendar_today', 'route' => 'internhub.attendance'],
-        ['key' => 'logbook', 'label' => 'Laporan Harian', 'icon' => 'auto_stories', 'route' => 'internhub.daily-logbook'],
-        ['key' => 'registration', 'label' => 'Pendaftaran Lokasi', 'icon' => 'app_registration', 'route' => 'internhub.registration'],
-        ['key' => 'reviews', 'label' => 'Ulasan Pembimbing', 'icon' => 'rate_review', 'route' => 'internhub.mentor-review'],
-        ['key' => 'administration', 'label' => 'Pusat Admin', 'icon' => 'admin_panel_settings', 'route' => 'internhub.admin-center'],
-    ];
+    $user = auth()->user();
+    $isAdmin = $user?->hasRole(\App\Models\User::ROLE_ADMIN);
+
+    $menuItems = $isAdmin
+        ? [
+            ['key' => 'dashboard', 'label' => 'Beranda', 'icon' => 'dashboard', 'route' => 'internhub.admin.dashboard'],
+            ['key' => 'attendance', 'label' => 'Presensi', 'icon' => 'calendar_today', 'route' => 'internhub.admin.attendance'],
+            ['key' => 'interns', 'label' => 'Data Intern', 'icon' => 'groups', 'route' => 'internhub.admin.interns'],
+            ['key' => 'locations', 'label' => 'Lokasi', 'icon' => 'location_on', 'route' => 'internhub.admin.locations'],
+            ['key' => 'reports', 'label' => 'Laporan', 'icon' => 'description', 'route' => 'internhub.admin.reports'],
+            ['key' => 'profile', 'label' => 'Profil', 'icon' => 'account_circle', 'route' => 'internhub.admin.profile'],
+        ]
+        : [
+            ['key' => 'dashboard', 'label' => 'Beranda', 'icon' => 'dashboard', 'route' => 'internhub.dashboard'],
+            ['key' => 'attendance', 'label' => 'Presensi', 'icon' => 'calendar_today', 'route' => 'internhub.intern.attendance'],
+            ['key' => 'logbook', 'label' => 'Laporan Harian', 'icon' => 'auto_stories', 'route' => 'internhub.daily-logbook'],
+            ['key' => 'registration', 'label' => 'Pendaftaran Lokasi', 'icon' => 'app_registration', 'route' => 'internhub.registration'],
+            ['key' => 'reviews', 'label' => 'Ulasan Pembimbing', 'icon' => 'rate_review', 'route' => 'internhub.mentor-review'],
+            ['key' => 'administration', 'label' => 'Pusat Admin', 'icon' => 'admin_panel_settings', 'route' => 'internhub.admin-center'],
+        ];
 @endphp
 
 <aside class="hidden lg:flex fixed inset-y-0 left-0 w-72 bg-surface-muted/95 border-r border-line px-4 py-6 flex-col">

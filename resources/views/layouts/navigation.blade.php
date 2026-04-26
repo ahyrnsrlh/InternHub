@@ -1,4 +1,10 @@
 <nav x-data="{ open: false }" class="bg-surface border-b border-line-soft">
+    @php
+        $profileRoute = auth()->user()?->hasRole(\App\Models\User::ROLE_ADMIN)
+            ? route('internhub.admin.profile')
+            : route('user.profile.index');
+    @endphp
+
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -34,7 +40,7 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
+                        <x-dropdown-link :href="$profileRoute">
                             Profil
                         </x-dropdown-link>
 
@@ -80,7 +86,7 @@
             </div>
 
             <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">
+                <x-responsive-nav-link :href="$profileRoute">
                     Profil
                 </x-responsive-nav-link>
 

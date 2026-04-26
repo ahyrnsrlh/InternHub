@@ -2,8 +2,8 @@
 
 use App\Models\User;
 use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Admin\AdminProfileController;
 use App\Http\Controllers\Admin\AdminPageController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\User\ReportController;
 use App\Http\Controllers\User\ProfileController as UserProfileController;
@@ -43,6 +43,8 @@ Route::prefix('internhub')->name('internhub.')->middleware(['auth', 'verified'])
 
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
         Route::get('/dashboard', [AdminPageController::class, 'dashboard'])->name('dashboard');
+        Route::get('/profile', [AdminProfileController::class, 'edit'])->name('profile');
+        Route::patch('/profile', [AdminProfileController::class, 'update'])->name('profile.update');
         Route::get('/dashboard/charts/attendance', [AdminPageController::class, 'getAdminAttendanceStats'])->name('dashboard.charts.attendance');
         Route::get('/dashboard/charts/validation', [AdminPageController::class, 'getAdminValidationStats'])->name('dashboard.charts.validation');
         Route::get('/dashboard/charts/trend', [AdminPageController::class, 'getAdminTrendStats'])->name('dashboard.charts.trend');
@@ -81,12 +83,6 @@ Route::prefix('internhub')->name('internhub.')->middleware(['auth', 'verified'])
     Route::redirect('/user/logbook', '/internhub/logbook');
     Route::redirect('/user/reports', '/internhub/reports');
     Route::redirect('/user/profile', '/internhub/profile');
-});
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 Route::prefix('user')->name('user.')->middleware(['auth', 'verified', 'role:intern,user'])->group(function () {
