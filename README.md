@@ -1,58 +1,277 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# InternHub
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+InternHub adalah aplikasi monitoring program magang berbasis Laravel untuk mengelola presensi, lokasi, logbook harian, dan pelaporan antara Admin dan Peserta Magang.
 
-## About Laravel
+Dokumen ini disiapkan agar tim client bisa melakukan instalasi awal, menjalankan aplikasi, dan memahami alur penggunaan tanpa kebingungan.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 1. Gambaran Singkat
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Tujuan Sistem
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Memudahkan admin memantau kehadiran dan aktivitas magang.
+- Memusatkan data operasional program magang dalam satu dashboard.
+- Menyediakan alur kerja peserta magang: presensi, logbook, dan laporan.
 
-## Learning Laravel
+### Role Utama
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- Admin
+  : akses dashboard admin, data intern, data kehadiran, lokasi, laporan, dan pengaturan profil admin.
+- Intern atau User
+  : akses dashboard peserta, presensi, lokasi, map, logbook, laporan, dan profil peserta.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 2. Fitur Utama
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### Fitur Admin
 
-## Agentic Development
+- Dashboard statistik kehadiran dan validasi.
+- Grafik tren dan aktivitas peserta.
+- Manajemen data peserta magang.
+- Monitoring data kehadiran dan status validasi lokasi.
+- Manajemen lokasi magang.
+- Rekap laporan kehadiran.
+- Halaman profil admin khusus di URL internhub/admin/profile.
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### Fitur Peserta
+
+- Dashboard personal.
+- Presensi check-in dan check-out.
+- Monitoring lokasi dan map.
+- Pengisian logbook harian.
+- Laporan dan ekspor PDF.
+- Profil peserta.
+
+## 3. Teknologi yang Digunakan
+
+- Backend: Laravel 13
+- Bahasa: PHP 8.3+
+- Frontend tooling: Vite, Tailwind CSS, Alpine.js
+- Database: MySQL atau SQLite
+- PDF Export: barryvdh/laravel-dompdf
+- Auth starter: Laravel Breeze
+
+## 4. Kebutuhan Sistem
+
+Pastikan environment sudah terpasang:
+
+- PHP 8.3 atau lebih baru
+- Composer 2.x
+- Node.js 20+ dan npm
+- Database server (MySQL direkomendasikan untuk lingkungan tim)
+- Git
+
+Untuk Windows + Laragon:
+
+- Aktifkan service Apache atau Nginx dan MySQL.
+- Pastikan versi PHP Laragon sesuai (8.3+).
+
+## 5. Instalasi Awal
+
+### A. Clone dan Install Dependensi
 
 ```bash
-composer require laravel/boost --dev
+git clone <url-repository> InternHub
+cd InternHub
 
-php artisan boost:install
+composer install
+npm install
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### B. Siapkan Environment
 
-## Contributing
+```bash
+copy .env.example .env
+php artisan key:generate
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Atur koneksi database di file .env sesuai server lokal Anda.
 
-## Code of Conduct
+Contoh MySQL:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=internhub
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-## Security Vulnerabilities
+### C. Migrasi dan Seeder
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+php artisan migrate --seed
+```
 
-## License
+Perintah di atas akan membuat tabel dan data awal untuk akun demo.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### D. Jalankan Aplikasi
+
+Opsi 1, satu command untuk development stack:
+
+```bash
+composer run dev
+```
+
+Opsi 2, jalankan terpisah:
+
+Terminal 1:
+
+```bash
+php artisan serve
+```
+
+Terminal 2:
+
+```bash
+npm run dev
+```
+
+Terminal 3 (opsional, jika butuh proses queue):
+
+```bash
+php artisan queue:listen --tries=1 --timeout=0
+```
+
+## 6. Akun Demo Seeder
+
+Setelah menjalankan migrate --seed, akun berikut tersedia:
+
+- Admin
+  : email admin@internhub.test
+  : password password
+
+- Mentor
+  : email mentor@internhub.test
+  : password password
+
+- Intern
+  : email alex@internhub.test
+  : password password
+
+- Intern
+  : email sarah@internhub.test
+  : password password
+
+## 7. URL Penting
+
+- Login: /login
+- Dashboard admin: /internhub/admin/dashboard
+- Profil admin: /internhub/admin/profile
+- Dashboard peserta: /user/dashboard
+
+## 8. Konfigurasi Penting
+
+File konfigurasi khusus project:
+
+- config/internhub.php
+
+Konfigurasi tracking yang bisa diatur lewat .env:
+
+```env
+TRACKING_START_HOUR=8
+TRACKING_END_HOUR=18
+TRACKING_INTERVAL_SECONDS=120
+```
+
+## 9. Struktur Folder Inti
+
+- app/Http/Controllers
+  : logika endpoint admin dan user.
+- app/Models
+  : model domain seperti User, Attendance, DailyLog, Location.
+- resources/views/pages/admin
+  : halaman admin.
+- resources/views/pages/user
+  : halaman peserta.
+- routes/web.php
+  : routing utama web.
+- database/migrations
+  : skema database.
+- database/seeders
+  : data awal aplikasi.
+
+## 10. Perintah Operasional Harian
+
+### Bersihkan Cache Aplikasi
+
+```bash
+php artisan optimize:clear
+```
+
+### Menjalankan Test
+
+```bash
+php artisan test
+```
+
+### Menampilkan Daftar Route
+
+```bash
+php artisan route:list
+```
+
+## 11. Panduan Deploy Singkat
+
+Checklist minimum production:
+
+1. Set APP_ENV=production dan APP_DEBUG=false di .env.
+2. Set APP_URL sesuai domain production.
+3. Jalankan composer install dengan opsi production dependency.
+4. Jalankan php artisan migrate --force.
+5. Build asset frontend dengan npm run build.
+6. Jalankan php artisan optimize.
+7. Konfigurasikan web server document root ke folder public.
+8. Pastikan permission folder storage dan bootstrap/cache benar.
+
+## 12. Troubleshooting Umum
+
+### Route tidak ditemukan
+
+Gejala: error route not defined.
+
+Solusi:
+
+```bash
+php artisan optimize:clear
+php artisan route:list
+```
+
+### Halaman berubah tapi browser masih menampilkan tampilan lama
+
+Gejala: view seolah belum update.
+
+Solusi:
+
+- Hard refresh browser (Ctrl + F5).
+- Jalankan php artisan optimize:clear.
+
+### 419 Page Expired
+
+Gejala: submit form gagal dengan status 419.
+
+Solusi:
+
+- Pastikan token CSRF tersedia.
+- Pastikan domain dan APP_URL konsisten.
+- Hapus cookie session lama, login ulang.
+
+### Asset CSS atau JS tidak termuat
+
+Gejala: tampilan berantakan atau script tidak jalan.
+
+Solusi:
+
+```bash
+npm install
+npm run dev
+```
+
+## 13. Catatan Keamanan
+
+- Jangan gunakan kredensial demo di production.
+- Ganti seluruh password awal setelah deploy.
+- Batasi akses akun admin dan gunakan password policy kuat.
+
+## 14. Lisensi
+
+Project ini menggunakan basis Laravel Framework yang berlisensi MIT.
